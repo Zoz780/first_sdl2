@@ -16,12 +16,14 @@ Sprite::~Sprite()
 	}
 }
 
-void Sprite::Init(float x, float y, float width, float height)
+void Sprite::Init(float x, float y, float z, float width, float height, float depth)
 {
 	m_x = x;
 	m_y = y;
+	m_z = z;
 	m_width = width;
 	m_height = height;
+	m_depth = depth;
 
 	if (m_vboID == 0)
 	{

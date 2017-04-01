@@ -3,7 +3,7 @@
 #define MODEL_H
 
 #include <stdio.h>
-#include <windows.h>
+
 #include <glew.h>
 #include <gl\GL.h>
 #include <SOIL.h>

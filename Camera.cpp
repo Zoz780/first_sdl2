@@ -74,70 +74,19 @@ bool Camera::needStrafeRight() const
 	return m_isStrafeRight;
 }
 
-//look up
+//Jump
 
-void Camera::startLookUp()
+void Camera::startJump()
 {
-	m_isLookUp = true;
+	m_isJump = true;
 }
 
-void Camera::stopLookUp()
+void Camera::stopJump()
 {
-	m_isLookUp = false;
+	m_isJump = false;
 }
 
-bool Camera::needLookUp() const
+bool Camera::needToJump() const
 {
-	return m_isLookUp;
-}
-
-//look down
-
-void Camera::startLookDown()
-{
-	m_isLookDown = true;
-}
-
-void Camera::stopLookDown()
-{
-	m_isLookDown = false;
-}
-
-bool Camera::needLookDown() const
-{
-	return m_isLookDown;
-}
-
-//Turn left
-
-void Camera::startTurnLeft()
-{
-	m_isTurnLeft = true;
-}
-
-void Camera::stopTurnLeft()
-{
-	m_isTurnLeft = false;
-}
-
-bool Camera::needTurnLeft() const
-{
-	return m_isTurnLeft;
-}
-
-//Turn right
-
-void Camera::startTurnRight()
-{
-	m_isTurnRight = true;
-}
-
-void Camera::stopTurnRight()
-{
-	m_isTurnRight = false;
-}
-
-bool Camera::needTurnRight() const
-{
-	return m_isTurnRight;
+	return m_isJump;
 }

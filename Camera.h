@@ -25,35 +25,17 @@ public:
 	void stopStrafeRight();
 	bool needStrafeRight() const;
 
-	//look up
-	void startLookUp();
-	void stopLookUp();
-	bool needLookUp() const;
-
-	//look down
-	void startLookDown();
-	void stopLookDown();
-	bool needLookDown() const;
-
-	//turn left
-	void startTurnLeft();
-	void stopTurnLeft();
-	bool needTurnLeft() const;
-
-	//turn right
-	void startTurnRight();
-	void stopTurnRight();
-	bool needTurnRight() const;
+	//Jump
+	void startJump();
+	void stopJump();
+	bool needToJump() const;
 
 private:
 
 	bool m_isGoForward;
 	bool m_isGoBackward;
-	bool m_isLookUp;
-	bool m_isLookDown;
-	bool m_isTurnLeft;
-	bool m_isTurnRight;
 	bool m_isStrafeLeft;
 	bool m_isStrafeRight;
+	bool m_isJump;
 };
 

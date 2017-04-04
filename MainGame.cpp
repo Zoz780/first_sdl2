@@ -32,6 +32,10 @@ double MainGame::CalcElapsedTime()
 	elapsed_time = (double)(current_time - m_time) / 1000.0;
 	m_time = current_time;
 
+    if (elapsed_time < 0.0 || elapsed_time > 1.0) {
+        elapsed_time = 0.0;
+    }
+
 	return elapsed_time;
 }
 
@@ -48,7 +52,7 @@ MainGame::MainGame()
 	m_mouse_speed = 0.05;
 	m_jump_flag = true;
 	m_game_state = GameState::PLAY;
-    m_gravity = -0.05f;
+    m_gravity = -1.0f;
     m_velocity_y = 0.0f;
 }
 
@@ -218,7 +222,7 @@ void MainGame::ProcessKeyPress()
 			break;
 		case 32:
             if (m_camera_y_pos <= 0.0f) {
-                m_velocity_y = 1.0f;
+                m_velocity_y = 12.0f;
             }
 			// camera.startJump();
 			break;
@@ -325,7 +329,7 @@ void MainGame::JumpHandler(double elapsed_time)
     */
     
     m_velocity_y += m_gravity;
-    m_camera_y_pos += m_velocity_y;
+    m_camera_y_pos += m_velocity_y * elapsed_time;
 
     float height = 0.0f;
 

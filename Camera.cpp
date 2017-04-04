@@ -1,8 +1,15 @@
 #include "Camera.h"
 
+#include <iostream>
+using namespace std;
 
 Camera::Camera()
 {
+	m_isGoForward = false;
+	m_isGoBackward = false;
+	m_isStrafeLeft = false;
+	m_isStrafeRight = false;
+	m_isJump = false;
 }
 
 

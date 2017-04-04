@@ -48,6 +48,8 @@ MainGame::MainGame()
 	m_mouse_speed = 0.05;
 	m_jump_flag = true;
 	m_game_state = GameState::PLAY;
+    m_gravity = -0.05f;
+    m_velocity_y = 0.0f;
 }
 
 void MainGame::Run()
@@ -93,10 +95,10 @@ void MainGame::GameLoop()
 	{
 		double elapsed_time;
 		elapsed_time = CalcElapsedTime();
-		
+
 		ProcessInput();
 		DrawGame();
-		CameraMovementHandler();
+		CameraMovementHandler(elapsed_time);
 	}
 }
 
@@ -142,13 +144,13 @@ void MainGame::DrawGame()
 	raptor.draw(0, -2, 20);
 	floor.draw(0, 0, 0);
 
-	/*glPushMatrix();
+	glPushMatrix();
 		glRotatef(180.0f, 0, 1, 0);
 		glTranslatef(-m_camera_x_pos, m_camera_y_pos, -m_camera_z_pos);
-		glRotatef(m_camera_x_rot, 1, 0, 0);
 		glRotatef(m_camera_y_rot, 0, 1, 0);
+		glRotatef(m_camera_x_rot, 1, 0, 0);
 		gun.draw(+0.03f, -0.07f, -0.1f);
-	glPopMatrix();*/
+	glPopMatrix();
 
 	SDL_GL_SwapWindow(m_window);
 }
@@ -160,7 +162,7 @@ void MainGame::LoadModels()
 	gun.load("Models/gun.obj", 0.2f, "Textures/gun.tga");
 }
 
-void MainGame::CameraMovementHandler()
+void MainGame::CameraMovementHandler(double elapsed_time)
 {
 	if (camera.needGoForward()) {
 		m_camera_x_pos += (float)sin(ToRad(m_camera_y_rot)) * 0.5f;
@@ -178,15 +180,21 @@ void MainGame::CameraMovementHandler()
 		m_camera_x_pos -= (float)cos(ToRad(m_camera_y_rot)) * 0.5f;
 		m_camera_z_pos -= (float)sin(ToRad(m_camera_y_rot)) * -0.5f;
 	}
+
+    JumpHandler(elapsed_time);
+
+    /*
 	if (camera.needToJump())
 	{
-		JumpHandler();
+		JumpHandler(elapsed_time);
 	}
 	else
 	{
 		m_jump_flag = true;
-		m_gravity = 0.14f;
+		// m_gravity = 0.14f;
+        m_velocity_y = 1.0f;
 	}
+    */
 }
 
 void MainGame::ProcessKeyPress()
@@ -209,7 +217,10 @@ void MainGame::ProcessKeyPress()
 			camera.startStrafeRight();
 			break;
 		case 32:
-			camera.startJump();
+            if (m_camera_y_pos <= 0.0f) {
+                m_velocity_y = 1.0f;
+            }
+			// camera.startJump();
 			break;
 		case 27:
 			m_game_state = GameState::EXIT;
@@ -251,8 +262,8 @@ void MainGame::MouseMotionHandler()
 	{	
 		SDL_ShowCursor(SDL_DISABLE);
 		SDL_WarpMouseInWindow(m_window, m_window_center_x, m_window_center_y);
-		m_camera_x_rot -= (evnt.motion.y - m_window_center_y) * m_mouse_speed;
-		m_camera_y_rot -= (evnt.motion.x - m_window_center_x) * m_mouse_speed;
+		m_camera_x_rot -= (float)(evnt.motion.y - m_window_center_y) * m_mouse_speed;
+		m_camera_y_rot -= (float)(evnt.motion.x - m_window_center_x) * m_mouse_speed;
 
 		if (m_camera_x_rot >= 87.0f)
 		{
@@ -280,8 +291,11 @@ void MainGame::MouseMotionHandler()
 	}
 }
 
-void MainGame::JumpHandler()
+void MainGame::JumpHandler(double elapsed_time)
 {
+    cout << elapsed_time << endl;
+
+    /*
 	const float m_max_jump_height = 3.0f;
 	if (m_jump_flag)
 	{
@@ -308,4 +322,16 @@ void MainGame::JumpHandler()
 		}
 	}
 	//cout << m_camera_y_pos << "Need to: " << camera.needToJump() << endl;
+    */
+    
+    m_velocity_y += m_gravity;
+    m_camera_y_pos += m_velocity_y;
+
+    float height = 0.0f;
+
+    if (m_camera_y_pos <= height) {
+        m_camera_y_pos = height;
+        m_velocity_y = 0.0f;
+    }
 }
+

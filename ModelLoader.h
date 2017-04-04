@@ -4,9 +4,11 @@
 
 #include <stdio.h>
 #include <glew.h>
-#include <gl\GL.h>
+#include <gl/GL.h>
 #include <SOIL.h>
 #include <iostream>
+
+#include <string.h>
 
 using namespace std;
 

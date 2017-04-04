@@ -1,5 +1,5 @@
 #pragma once
-#include <SDL2\SDL.h>
+#include <SDL2/SDL.h>
 #include "ModelDrawer.h"
 #include "Camera.h"
 #include "Sprite.h"
@@ -25,10 +25,10 @@ private:
 	void ProcessInput();
 	void DrawGame();
 	void LoadModels();
-	void CameraMovementHandler();
+	void CameraMovementHandler(double elapsed_time);
 	void MouseMotionHandler();
 	void ProcessKeyPress();
-	void JumpHandler();
+	void JumpHandler(double elapsed_time);
 	void ProcessKeyRelease();
 	double CalcElapsedTime();
 
@@ -51,8 +51,10 @@ private:
 	float m_camera_y_rot;
 
 	float m_mouse_speed;
-	float m_gravity = 0.14f;
+	float m_gravity;
 	bool m_jump_flag;
+
+    float m_velocity_y;
 
 	int m_time;
 };

@@ -8,7 +8,7 @@
 
 // TODO: Add line info to the token array for easier debugging!
 
-int count_tokens(const char* text)
+int Model_loader::count_tokens(const char* text)
 {
 	int i = 0;
 	int is_token = FALSE;
@@ -28,7 +28,7 @@ int count_tokens(const char* text)
 	return count;
 }
 
-void extract_tokens(const char* text, struct TokenArray* token_array)
+void Model_loader::extract_tokens(const char* text, struct TokenArray* token_array)
 {
 	int n_tokens, token_length;
 	char* token;
@@ -53,7 +53,7 @@ void extract_tokens(const char* text, struct TokenArray* token_array)
 	}
 }
 
-char* copy_token(const char* text, int offset, int length)
+char* Model_loader::copy_token(const char* text, int offset, int length)
 {
 	char* token;
 	int i;
@@ -67,13 +67,13 @@ char* copy_token(const char* text, int offset, int length)
 	return token;
 }
 
-void insert_token(const char* token, struct TokenArray* token_array)
+void Model_loader::insert_token(const char* token, struct TokenArray* token_array)
 {
 	token_array->tokens[token_array->n_tokens] = (char*)token;
 	++token_array->n_tokens;
 }
 
-int calc_token_length(const char* text, int start_index)
+int Model_loader::calc_token_length(const char* text, int start_index)
 {
 	int end_index, length;
 
@@ -86,7 +86,7 @@ int calc_token_length(const char* text, int start_index)
 	return length;
 }
 
-void free_tokens(struct TokenArray* token_array)
+void Model_loader::free_tokens(struct TokenArray* token_array)
 {
 	int i;
 
@@ -96,7 +96,7 @@ void free_tokens(struct TokenArray* token_array)
 	free(token_array->tokens);
 }
 
-int load_model(const char* filename, struct Model* model)
+int Model_loader::load_model(const char* filename, struct Model* model)
 {
 	FILE* obj_file = fopen(filename, "r");
 	printf("Load model '%s' ...\n", filename);
@@ -114,7 +114,7 @@ int load_model(const char* filename, struct Model* model)
 	return TRUE;
 }
 
-void print_model_info(const struct Model* model)
+void Model_loader::print_model_info(const struct Model* model)
 {
 	printf("Vertices: %d\n", model->n_vertices);
 	printf("Texture vertices: %d\n", model->n_texture_vertices);
@@ -123,7 +123,7 @@ void print_model_info(const struct Model* model)
 	printf("Quads: %d\n", model->n_quads);
 }
 
-void free_model(struct Model* model)
+void Model_loader::free_model(struct Model* model)
 {
 	free(model->vertices);
 	free(model->texture_vertices);
@@ -132,7 +132,7 @@ void free_model(struct Model* model)
 	free(model->quads);
 }
 
-void count_elements(FILE* file, struct Model* model)
+void Model_loader::count_elements(FILE* file, struct Model* model)
 {
 	char line[LINE_BUFFER_SIZE];
 
@@ -143,7 +143,7 @@ void count_elements(FILE* file, struct Model* model)
 	}
 }
 
-void read_elements(FILE* file, struct Model* model)
+void Model_loader::read_elements(FILE* file, struct Model* model)
 {
 	char line[LINE_BUFFER_SIZE];
 
@@ -159,7 +159,7 @@ void read_elements(FILE* file, struct Model* model)
 	}
 }
 
-void init_model_counters(struct Model* model)
+void Model_loader::init_model_counters(struct Model* model)
 {
 	model->n_vertices = 0;
 	model->n_texture_vertices = 0;
@@ -168,7 +168,7 @@ void init_model_counters(struct Model* model)
 	model->n_quads = 0;
 }
 
-void clear_comment(char* line)
+void Model_loader::clear_comment(char* line)
 {
 	int i = 0;
 	while (line[i] != 0 && line[i] != '#') {
@@ -182,7 +182,7 @@ void clear_comment(char* line)
 	}
 }
 
-void count_element_in_line(const char* line, struct Model* model)
+void Model_loader::count_element_in_line(const char* line, struct Model* model)
 {
 	struct TokenArray token_array;
 	char* first_token;
@@ -216,7 +216,7 @@ void count_element_in_line(const char* line, struct Model* model)
 	free_tokens(&token_array);
 }
 
-void read_element_from_line(const char* line, struct Model* model)
+void Model_loader::read_element_from_line(const char* line, struct Model* model)
 {
 	struct TokenArray token_array;
 	char* first_token;
@@ -262,7 +262,7 @@ void read_element_from_line(const char* line, struct Model* model)
 	free_tokens(&token_array);
 }
 
-void create_arrays(struct Model* model)
+void Model_loader::create_arrays(struct Model* model)
 {
 	model->vertices = (struct Vertex*)malloc((model->n_vertices + 1) * sizeof(struct Vertex));
 	model->texture_vertices = (struct TextureVertex*)malloc((model->n_texture_vertices + 1) * sizeof(struct TextureVertex));
@@ -271,27 +271,27 @@ void create_arrays(struct Model* model)
 	model->quads = (struct Quad*)malloc(model->n_quads * sizeof(struct Quad));
 }
 
-void read_vertex(const struct TokenArray* token_array, struct Vertex* vertex)
+void Model_loader::read_vertex(const struct TokenArray* token_array, struct Vertex* vertex)
 {
 	vertex->x = atof(token_array->tokens[1]);
 	vertex->y = atof(token_array->tokens[2]);
 	vertex->z = atof(token_array->tokens[3]);
 }
 
-void read_texture_vertex(const struct TokenArray* token_array, struct TextureVertex* texture_vertex)
+void Model_loader::read_texture_vertex(const struct TokenArray* token_array, struct TextureVertex* texture_vertex)
 {
 	texture_vertex->u = atof(token_array->tokens[1]);
 	texture_vertex->v = atof(token_array->tokens[2]);
 }
 
-void read_normal(const struct TokenArray* token_array, struct Vertex* normal)
+void Model_loader::read_normal(const struct TokenArray* token_array, struct Vertex* normal)
 {
 	normal->x = atof(token_array->tokens[1]);
 	normal->y = atof(token_array->tokens[2]);
 	normal->z = atof(token_array->tokens[3]);
 }
 
-void read_triangle(const struct TokenArray* token_array, struct Triangle* triangle)
+void Model_loader::read_triangle(const struct TokenArray* token_array, struct Triangle* triangle)
 {
 	int i;
 
@@ -300,7 +300,7 @@ void read_triangle(const struct TokenArray* token_array, struct Triangle* triang
 	}
 }
 
-void read_quad(const struct TokenArray* token_array, struct Quad* quad)
+void Model_loader::read_quad(const struct TokenArray* token_array, struct Quad* quad)
 {
 	int i;
 
@@ -309,7 +309,7 @@ void read_quad(const struct TokenArray* token_array, struct Quad* quad)
 	}
 }
 
-void read_face_point(const char* text, struct FacePoint* face_point)
+void Model_loader::read_face_point(const char* text, struct FacePoint* face_point)
 {
 	int delimiter_count;
 	const char* token;
@@ -342,7 +342,7 @@ void read_face_point(const char* text, struct FacePoint* face_point)
 	}
 }
 
-int count_face_delimiters(const char* text)
+int Model_loader::count_face_delimiters(const char* text)
 {
 	int count, i;
 
@@ -358,7 +358,7 @@ int count_face_delimiters(const char* text)
 	return count;
 }
 
-int read_next_index(const char* text, int* length)
+int Model_loader::read_next_index(const char* text, int* length)
 {
 	int i, j, index;
 	char buffer[32];
@@ -386,7 +386,7 @@ int read_next_index(const char* text, int* length)
 	return index;
 }
 
-int is_digit(char c)
+int Model_loader::is_digit(char c)
 {
 	if (c >= '0' && c <= '9') {
 		return TRUE;
@@ -394,7 +394,7 @@ int is_digit(char c)
 	return FALSE;
 }
 
-int is_valid_triangle(const struct Triangle* triangle, const struct Model* model)
+int Model_loader::is_valid_triangle(const struct Triangle* triangle, const struct Model* model)
 {
 	int k;
 
@@ -415,7 +415,7 @@ int is_valid_triangle(const struct Triangle* triangle, const struct Model* model
 	return TRUE;
 }
 
-int is_valid_quad(const struct Quad* quad, const struct Model* model)
+int Model_loader::is_valid_quad(const struct Quad* quad, const struct Model* model)
 {
 	int k;
 	int vertex_index, texture_index, normal_index;
@@ -440,7 +440,7 @@ int is_valid_quad(const struct Quad* quad, const struct Model* model)
 	return TRUE;
 }
 
-void print_bounding_box(const struct Model* model)
+void Model_loader::print_bounding_box(const struct Model* model)
 {
 	int i;
 	double x, y, z;
@@ -487,7 +487,7 @@ void print_bounding_box(const struct Model* model)
 	printf("z in [%lf, %lf]\n", min_z, max_z);
 }
 
-void scale_model(struct Model* model, double sx, double sy, double sz)
+void Model_loader::scale_model(struct Model* model, double sx, double sy, double sz)
 {
 	int i;
 

@@ -25,10 +25,20 @@ public:
 	void stopStrafeRight();
 	bool needStrafeRight() const;
 
-	//Jump
-	void startJump();
-	void stopJump();
-	bool needToJump() const;
+	//Running
+	void startRun();
+	void stopRun();
+	bool needToRun() const;
+
+	//Crouching
+	void startCrouch();
+	void stopCrouch();
+	bool needToCrouch() const;
+
+	//Check the player moving or not
+	void playerMoving();
+	void playerNotMoving();
+	bool needToMove() const;
 
 private:
 
@@ -36,6 +46,8 @@ private:
 	bool m_isGoBackward;
 	bool m_isStrafeLeft;
 	bool m_isStrafeRight;
-	bool m_isJump;
+	bool m_isRunning;
+	bool m_isCrouching;
+	bool m_one_of_movement_keys_pressed;
 };
 

@@ -9,7 +9,9 @@ Camera::Camera()
 	m_isGoBackward = false;
 	m_isStrafeLeft = false;
 	m_isStrafeRight = false;
-	m_isJump = false;
+	m_isRunning = false;
+	m_isCrouching = false;
+	m_one_of_movement_keys_pressed = false;
 }
 
 
@@ -81,19 +83,50 @@ bool Camera::needStrafeRight() const
 	return m_isStrafeRight;
 }
 
-//Jump
+//Running
 
-void Camera::startJump()
+void Camera::startRun()
 {
-	m_isJump = true;
+	m_isRunning = true;
 }
 
-void Camera::stopJump()
+void Camera::stopRun()
 {
-	m_isJump = false;
+	m_isRunning = false;
 }
 
-bool Camera::needToJump() const
+bool Camera::needToRun() const
 {
-	return m_isJump;
+	return m_isRunning;
+}
+
+
+//Crouching
+void Camera::startCrouch()
+{
+	m_isCrouching = true;
+}
+
+void Camera::stopCrouch()
+{
+	m_isCrouching = false;
+}
+
+bool Camera::needToCrouch() const
+{
+	return m_isCrouching;
+}
+
+//Check the player moving or not
+void Camera::playerMoving() 
+{
+	m_one_of_movement_keys_pressed = true;
+}
+void Camera::playerNotMoving()
+{
+	m_one_of_movement_keys_pressed = false;
+}
+bool Camera::needToMove() const
+{
+	return m_one_of_movement_keys_pressed;
 }

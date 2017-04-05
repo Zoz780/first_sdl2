@@ -2,7 +2,7 @@
 #include <SDL2/SDL.h>
 #include "ModelDrawer.h"
 #include "Camera.h"
-#include "Sprite.h"
+#include "Utils.h"
 #include <glut.h>
 
 enum class GameState
@@ -30,6 +30,7 @@ private:
 	void ProcessKeyPress();
 	void JumpHandler(double elapsed_time);
 	void ProcessKeyRelease();
+	void CalculatePlayerDeathTime(double elapsed_time);
 	double CalcElapsedTime();
 
 	SDL_Window* m_window;
@@ -38,11 +39,11 @@ private:
 	int m_screen_width;
 	int m_screen_hight;
 
-	Sprite m_sprite;
 	Model_drawer raptor;
 	Model_drawer floor;
 	Model_drawer gun;
 	Camera camera;
+	Utils utils;
 
 	float m_camera_x_pos;
 	float m_camera_y_pos;
@@ -51,8 +52,11 @@ private:
 	float m_camera_y_rot;
 
 	float m_mouse_speed;
+	float m_movement_speed;
 	float m_gravity;
-	bool m_jump_flag;
+	float m_ground_height;
+	float m_character_height;
+	float m_time_until_die;
 
     float m_velocity_y;
 

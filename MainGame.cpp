@@ -1,43 +1,7 @@
 #include "MainGame.h"
 #include <iostream>
-#include <string>
-#define _USE_MATH_DEFINES
-#include <math.h>
 
 using namespace std;
-
-inline float ToRad(float angle_degrees) {
-	return angle_degrees * M_PI / 180.0f;
-}
-
-inline float ToDegree(float angle_rad) {
-	return (angle_rad * 180.0f) / M_PI;
-}
-
-void FatalError(string error)
-{
-	cout << error << endl;
-	cout << "Enter any key to quit...\n";
-	int tmp;
-	cin >> tmp;
-	SDL_QUIT;
-}
-
-double MainGame::CalcElapsedTime()
-{
-	int current_time;
-	double elapsed_time;
-
-	current_time = SDL_GetTicks();
-	elapsed_time = (double)(current_time - m_time) / 1000.0;
-	m_time = current_time;
-
-    if (elapsed_time < 0.0 || elapsed_time > 1.0) {
-        elapsed_time = 0.0;
-    }
-
-	return elapsed_time;
-}
 
 MainGame::MainGame()
 {
@@ -50,16 +14,35 @@ MainGame::MainGame()
 	m_camera_x_rot = 0;
 	m_camera_y_rot = 0;
 	m_mouse_speed = 0.05;
-	m_jump_flag = true;
+	m_movement_speed = 20.0f;
 	m_game_state = GameState::PLAY;
-    m_gravity = -1.0f;
+    m_gravity = -0.1f;
+	m_time = 0.0f;
+	m_ground_height = 0.0f;
     m_velocity_y = 0.0f;
+	m_character_height = 3.0f;
+	m_time_until_die = 2.0f;
+}
+
+double MainGame::CalcElapsedTime()
+{
+	int current_time;
+	double elapsed_time;
+
+	current_time = SDL_GetTicks();
+	elapsed_time = (double)(current_time - m_time) / 1000.0;
+	m_time = current_time;
+
+	if (elapsed_time < 0.0 || elapsed_time > 1.0) {
+		elapsed_time = 0.0;
+	}
+
+	return elapsed_time;
 }
 
 void MainGame::Run()
 {
 	Init();
-	m_sprite.Init(-1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f);
 	GameLoop();
 }
 
@@ -70,19 +53,19 @@ void MainGame::Init()
 	m_window = SDL_CreateWindow("FPS Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_screen_width, m_screen_hight, SDL_WINDOW_OPENGL);
 	if (m_window == nullptr)
 	{
-		FatalError("The SDL window could not be created!\n");
+		utils.FatalError("The SDL window could not be created!\n");
 	}
 
 	SDL_GLContext glContext = SDL_GL_CreateContext(m_window);
 	if (glContext == nullptr)
 	{
-		FatalError("The SDL_GL context could not be created!\n");
+		utils.FatalError("The SDL_GL context could not be created!\n");
 	}
 
 	GLenum error = glewInit();
 	if (error != GLEW_OK)
 	{
-		FatalError("Could not init glew!\n");
+		utils.FatalError("Could not init glew!\n");
 	}
 
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -104,6 +87,24 @@ void MainGame::GameLoop()
 		DrawGame();
 		CameraMovementHandler(elapsed_time);
 	}
+}
+
+void MainGame::CalculatePlayerDeathTime(double elapsed_time)
+{
+	if (camera.needToMove() == false)
+	{
+		m_time_until_die -= elapsed_time;
+		if (m_time_until_die <= 0.0f)
+		{
+			cout << "Died!!!\n";
+		}
+	}
+	else
+	{
+		m_time_until_die = 2.0f;
+		cout << "Alive!!!\n";
+	}
+	//cout << m_time_until_die << endl;
 }
 
 void MainGame::ProcessInput()
@@ -128,8 +129,8 @@ void MainGame::DrawGame()
 
 	glLoadIdentity();
 	/*moving, rotating*/glMatrixMode(GL_MODELVIEW);
-	float verticalAngle = ToRad(m_camera_x_rot);
-	float horizontalAngle = ToRad(m_camera_y_rot);
+	float verticalAngle = utils.ToRad(m_camera_x_rot);
+	float horizontalAngle = utils.ToRad(m_camera_y_rot);
 
 	float dx = cos(verticalAngle) * sin(horizontalAngle);
 	float dy = sin(verticalAngle);
@@ -145,7 +146,7 @@ void MainGame::DrawGame()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	raptor.draw(0, -2, 20);
+	raptor.draw(0, 0, 20);
 	floor.draw(0, 0, 0);
 
 	glPushMatrix();
@@ -168,37 +169,61 @@ void MainGame::LoadModels()
 
 void MainGame::CameraMovementHandler(double elapsed_time)
 {
+	//cout << camera.needToMove() << endl;
 	if (camera.needGoForward()) {
-		m_camera_x_pos += (float)sin(ToRad(m_camera_y_rot)) * 0.5f;
-		m_camera_z_pos += (float)cos(ToRad(m_camera_y_rot)) * 0.5f;
-	}
-	if (camera.needGoBackward()) {
-		m_camera_x_pos -= (float)sin(ToRad(m_camera_y_rot)) * 0.5f;
-		m_camera_z_pos -= (float)cos(ToRad(m_camera_y_rot)) * 0.5f;
-	}
-	if (camera.needStrafeLeft()) {
-		m_camera_x_pos += (float)cos(ToRad(m_camera_y_rot)) * 0.5f;
-		m_camera_z_pos += (float)sin(ToRad(m_camera_y_rot)) * -0.5f;
-	}
-	if (camera.needStrafeRight()) {
-		m_camera_x_pos -= (float)cos(ToRad(m_camera_y_rot)) * 0.5f;
-		m_camera_z_pos -= (float)sin(ToRad(m_camera_y_rot)) * -0.5f;
-	}
-
-    JumpHandler(elapsed_time);
-
-    /*
-	if (camera.needToJump())
-	{
-		JumpHandler(elapsed_time);
+		m_camera_x_pos += (float)sin(utils.ToRad(m_camera_y_rot)) * m_movement_speed * elapsed_time;
+		m_camera_z_pos += (float)cos(utils.ToRad(m_camera_y_rot)) * m_movement_speed * elapsed_time;
+		camera.playerMoving();
 	}
 	else
 	{
-		m_jump_flag = true;
-		// m_gravity = 0.14f;
-        m_velocity_y = 1.0f;
+		camera.playerNotMoving();
 	}
-    */
+
+	if (camera.needGoBackward()) {
+		m_camera_x_pos -= (float)sin(utils.ToRad(m_camera_y_rot)) * m_movement_speed * elapsed_time;
+		m_camera_z_pos -= (float)cos(utils.ToRad(m_camera_y_rot)) * m_movement_speed * elapsed_time;
+		camera.playerMoving();
+	}
+
+
+	if (camera.needStrafeLeft()) {
+		m_camera_x_pos += (float)cos(utils.ToRad(m_camera_y_rot)) * m_movement_speed * elapsed_time;
+		m_camera_z_pos += (float)sin(utils.ToRad(m_camera_y_rot)) * -m_movement_speed * elapsed_time;
+		camera.playerMoving();
+	}
+
+
+	if (camera.needStrafeRight()) {
+		m_camera_x_pos -= (float)cos(utils.ToRad(m_camera_y_rot)) * m_movement_speed * elapsed_time;
+		m_camera_z_pos -= (float)sin(utils.ToRad(m_camera_y_rot)) * -m_movement_speed * elapsed_time;
+		camera.playerMoving();
+	}
+
+	if (camera.needToRun())
+	{
+		m_movement_speed = 30.0f;
+	}
+	else
+		m_movement_speed = 20.0f;
+	if (camera.needToCrouch())
+	{
+		if (m_character_height >= 2.0f)
+		{
+			m_character_height -= 12.0f * elapsed_time;
+			cout << m_character_height << endl;
+		}
+	}
+	else
+	{
+		if (m_character_height <= 3.0f)
+		{
+			m_character_height += 6.0f * elapsed_time;
+			cout << m_character_height << endl;
+		}
+	}
+	CalculatePlayerDeathTime(elapsed_time);
+	JumpHandler(elapsed_time);
 }
 
 void MainGame::ProcessKeyPress()
@@ -220,13 +245,18 @@ void MainGame::ProcessKeyPress()
 		case 'd':
 			camera.startStrafeRight();
 			break;
-		case 32:
-            if (m_camera_y_pos <= 0.0f) {
-                m_velocity_y = 12.0f;
-            }
-			// camera.startJump();
+		case SDLK_LSHIFT:
+			camera.startRun();
 			break;
-		case 27:
+		case SDLK_LCTRL:
+			camera.startCrouch();
+			break;
+		case SDLK_SPACE:
+            if (m_camera_y_pos <= m_character_height + m_ground_height) {
+                m_velocity_y = 17.0f;
+            }
+			break;
+		case SDLK_ESCAPE:
 			m_game_state = GameState::EXIT;
 			exit(0);
 			break;
@@ -252,6 +282,12 @@ void MainGame::ProcessKeyRelease()
 			break;
 		case 'd':
 			camera.stopStrafeRight();
+			break;
+		case SDLK_LCTRL:
+			camera.stopCrouch();
+			break;
+		case SDLK_LSHIFT:
+			camera.stopRun();
 			break;
 		}
 	}
@@ -297,44 +333,20 @@ void MainGame::MouseMotionHandler()
 
 void MainGame::JumpHandler(double elapsed_time)
 {
-    cout << elapsed_time << endl;
-
-    /*
-	const float m_max_jump_height = 3.0f;
-	if (m_jump_flag)
-	{
-		if (m_camera_y_pos < m_max_jump_height)
-		{
-			m_gravity *= 0.97f;
-			m_camera_y_pos += m_gravity;
-		}
-		else
-			m_jump_flag = false;
-		
-	}
-	else
-	{
-		if (m_camera_y_pos > 0.0f)
-		{
-			m_gravity *= 1.02f;
-			m_camera_y_pos -= m_gravity;
-		}
-		else
-		{
-			m_camera_y_pos = 0.0f;
-			camera.stopJump();
-		}
-	}
-	//cout << m_camera_y_pos << "Need to: " << camera.needToJump() << endl;
-    */
+    //cout << elapsed_time << endl;
     
     m_velocity_y += m_gravity;
     m_camera_y_pos += m_velocity_y * elapsed_time;
 
-    float height = 0.0f;
+	if (m_camera_z_pos > 50.0f)
+	{
+		m_ground_height = 5.0f;
+	}
+	else
+		m_ground_height = 0.0f;
 
-    if (m_camera_y_pos <= height) {
-        m_camera_y_pos = height;
+    if (m_camera_y_pos <= m_character_height + m_ground_height) {
+        m_camera_y_pos = m_character_height + m_ground_height;
         m_velocity_y = 0.0f;
     }
 }

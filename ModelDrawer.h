@@ -4,24 +4,8 @@
 
 using namespace std;
 
-/**
-* Draw the model.
-*/
-void draw_model(const struct Model* model);
-
-/**
-* Draw the triangles of the model.
-*/
-void draw_triangles(const struct Model* model);
-
-/**
-* Draw the quads of the model.
-*/
-void draw_quads(const struct Model* model);
-
 class Model_drawer : Model_loader
 {
-	Model_loader load_M;
 
 public:
 	Model_drawer();
@@ -29,12 +13,12 @@ public:
 
 	int load(const char *model_name, float scale, const char *texture_file)
 	{
-		free();     // hatha mar egyszer volt betoltve, felszabaditjuk az elozot
+		free();
 
 		if (!load_model(model_name, &model))
 			return FALSE;
 
-		scale_model(&model, scale, scale, scale);   // atmeretezzuk, hogy ne logjon ki a vilagunkbol
+		scale_model(&model, scale, scale, scale);
 
 		texture = SOIL_load_OGL_texture
 		(
@@ -44,9 +28,9 @@ public:
 			0
 		);
 
-		if (texture == 0)   // ha nem sikerult a textura betoltese
+		if (texture == 0) 
 		{
-			free();         // a model-t felszabaditjuk
+			free(); 
 			return FALSE;
 		}
 
@@ -81,5 +65,20 @@ public:
 		if (texture != 0)
 			glDeleteTextures(1, &texture);
 	}
+protected:
+	/**
+	* Draw the model.
+	*/
+	void draw_model(const struct Model* model);
+
+	/**
+	* Draw the triangles of the model.
+	*/
+	void draw_triangles(const struct Model* model);
+
+	/**
+	* Draw the quads of the model.
+	*/
+	void draw_quads(const struct Model* model);
 };
 

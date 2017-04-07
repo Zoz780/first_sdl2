@@ -13,5 +13,8 @@ public:
 	void FatalError(string error);
 	float ToRad(float angle_degrees);
 	float ToDegree(float angle_rad);
+	double CalcElapsedTime();
+
+	int m_time;
 };
 

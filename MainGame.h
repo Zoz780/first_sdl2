@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include "ModelDrawer.h"
 #include "Camera.h"
+#include "Platform.h"
 #include "Utils.h"
 #include <glut.h>
 
@@ -28,10 +29,9 @@ private:
 	void CameraMovementHandler(double elapsed_time);
 	void MouseMotionHandler();
 	void ProcessKeyPress();
-	void JumpHandler(double elapsed_time);
+	void GravityHandler(double elapsed_time);
 	void ProcessKeyRelease();
 	void CalculatePlayerDeathTime(double elapsed_time);
-	double CalcElapsedTime();
 
 	SDL_Window* m_window;
 	SDL_Event evnt;
@@ -44,6 +44,7 @@ private:
 	Model_drawer gun;
 	Camera camera;
 	Utils utils;
+	Platform platform;
 
 	float m_camera_x_pos;
 	float m_camera_y_pos;
@@ -59,7 +60,5 @@ private:
 	float m_time_until_die;
 
     float m_velocity_y;
-
-	int m_time;
 };
 

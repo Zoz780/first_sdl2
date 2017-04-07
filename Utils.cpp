@@ -2,6 +2,7 @@
 
 Utils::Utils()
 {
+	m_time = 0;
 }
 
 float Utils::ToRad(float angle_degrees) {
@@ -19,5 +20,21 @@ void Utils::FatalError(string error)
 	int tmp;
 	cin >> tmp;
 	SDL_QUIT;
+}
+
+double Utils::CalcElapsedTime()
+{
+	int current_time;
+	double elapsed_time;
+
+	current_time = SDL_GetTicks();
+	elapsed_time = (double)(current_time - m_time) / 1000.0;
+	m_time = current_time;
+
+	if (elapsed_time < 0.0 || elapsed_time > 1.0) {
+		elapsed_time = 0.0;
+	}
+
+	return elapsed_time;
 }
 

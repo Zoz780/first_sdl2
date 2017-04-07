@@ -16,28 +16,12 @@ MainGame::MainGame()
 	m_mouse_speed = 0.05;
 	m_movement_speed = 20.0f;
 	m_game_state = GameState::PLAY;
-    m_gravity = -0.1f;
-	m_time = 0.0f;
+    m_gravity = -60.0f;
 	m_ground_height = 0.0f;
     m_velocity_y = 0.0f;
 	m_character_height = 3.0f;
 	m_time_until_die = 2.0f;
-}
-
-double MainGame::CalcElapsedTime()
-{
-	int current_time;
-	double elapsed_time;
-
-	current_time = SDL_GetTicks();
-	elapsed_time = (double)(current_time - m_time) / 1000.0;
-	m_time = current_time;
-
-	if (elapsed_time < 0.0 || elapsed_time > 1.0) {
-		elapsed_time = 0.0;
-	}
-
-	return elapsed_time;
+	m_ground_height = 0.0f;
 }
 
 void MainGame::Run()
@@ -71,7 +55,7 @@ void MainGame::Init()
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-
+	SDL_GL_SetSwapInterval(0);
 	LoadModels();
 
 }
@@ -81,7 +65,7 @@ void MainGame::GameLoop()
 	while (m_game_state != GameState::EXIT)
 	{
 		double elapsed_time;
-		elapsed_time = CalcElapsedTime();
+		elapsed_time = utils.CalcElapsedTime();
 
 		ProcessInput();
 		DrawGame();
@@ -146,7 +130,7 @@ void MainGame::DrawGame()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	raptor.draw(0, 0, 20);
+	raptor.draw(0, 5, 100);
 	floor.draw(0, 0, 0);
 
 	glPushMatrix();
@@ -223,7 +207,7 @@ void MainGame::CameraMovementHandler(double elapsed_time)
 		}
 	}
 	CalculatePlayerDeathTime(elapsed_time);
-	JumpHandler(elapsed_time);
+	GravityHandler(elapsed_time);
 }
 
 void MainGame::ProcessKeyPress()
@@ -253,7 +237,7 @@ void MainGame::ProcessKeyPress()
 			break;
 		case SDLK_SPACE:
             if (m_camera_y_pos <= m_character_height + m_ground_height) {
-                m_velocity_y = 17.0f;
+                m_velocity_y = 16.0f;
             }
 			break;
 		case SDLK_ESCAPE:
@@ -331,23 +315,30 @@ void MainGame::MouseMotionHandler()
 	}
 }
 
-void MainGame::JumpHandler(double elapsed_time)
+void MainGame::GravityHandler(double elapsed_time)
 {
     //cout << elapsed_time << endl;
     
-    m_velocity_y += m_gravity;
+    m_velocity_y += m_gravity * elapsed_time;
     m_camera_y_pos += m_velocity_y * elapsed_time;
 
-	if (m_camera_z_pos > 50.0f)
+	//Bilinear interpolation test code
+	if ((m_camera_z_pos > 30.0f) && (m_camera_z_pos < 50.0f))
+	{
+		m_ground_height = platform.BilinearInterpolation(0, 5, 0, 5, -10, 10, 30, 50, m_camera_x_pos, m_camera_z_pos);
+	}
+	else if (m_camera_z_pos >= 50.0f)
 	{
 		m_ground_height = 5.0f;
 	}
-	else
+	else if (m_camera_z_pos <= 30.0f)
+	{
 		m_ground_height = 0.0f;
+	}
+	//Bilinear interpolation test code end
 
     if (m_camera_y_pos <= m_character_height + m_ground_height) {
         m_camera_y_pos = m_character_height + m_ground_height;
         m_velocity_y = 0.0f;
     }
 }
-

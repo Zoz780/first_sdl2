@@ -10,8 +10,9 @@ bool Platform::IsOnPlatform(float x, float y) const
 	return true;
 }
 
-float Platform::BilinearInterpolation(float height_11, float height_12, float height_21, float height_22, float x1, float x2, float z1, float z2, float x, float z)
+float Platform::GetHeight(float height_11, float height_12, float height_21, float height_22, float x1, float x2, float z1, float z2, float x, float z)
 {
+
 	float actual_height;
 	float distance_x2x1, distance_z2z1, distance_x2x, distance_z2z, distance_xx1, distance_zz1;
 	distance_x2x1 = x2 - x1;

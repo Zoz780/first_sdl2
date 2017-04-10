@@ -65,7 +65,8 @@ public:
 		if (texture != 0)
 			glDeleteTextures(1, &texture);
 	}
-protected:
+private:
+GLuint vboId;
 	/**
 	* Draw the model.
 	*/

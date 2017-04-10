@@ -195,15 +195,16 @@ void MainGame::CameraMovementHandler(double elapsed_time)
 		if (m_character_height >= 2.0f)
 		{
 			m_character_height -= 12.0f * elapsed_time;
-			cout << m_character_height << endl;
+			//cout << m_character_height << endl;
 		}
+		m_movement_speed = 12.0f;
 	}
 	else
 	{
 		if (m_character_height <= 3.0f)
 		{
 			m_character_height += 6.0f * elapsed_time;
-			cout << m_character_height << endl;
+			//cout << m_character_height << endl;
 		}
 	}
 	CalculatePlayerDeathTime(elapsed_time);
@@ -325,7 +326,7 @@ void MainGame::GravityHandler(double elapsed_time)
 	//Bilinear interpolation test code
 	if ((m_camera_z_pos > 30.0f) && (m_camera_z_pos < 50.0f))
 	{
-		m_ground_height = platform.BilinearInterpolation(0, 5, 0, 5, -10, 10, 30, 50, m_camera_x_pos, m_camera_z_pos);
+		m_ground_height = platform.GetHeight(0, 5, 0, 5, -10, 10, 30, 50, m_camera_x_pos, m_camera_z_pos);
 	}
 	else if (m_camera_z_pos >= 50.0f)
 	{

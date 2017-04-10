@@ -7,11 +7,10 @@ void Model_drawer::draw_triangles(const struct Model* model)
 	float x, y, z, u, v;
 
 	glBegin(GL_TRIANGLES);
-
 	for (i = 0; i < model->n_triangles; ++i)
-	{
-		for (k = 0; k < 3; ++k)
 		{
+			for (k = 0; k < 3; ++k)
+			{
 
 			texture_index = model->triangles[i].points[k].texture_index;
 			u = model->texture_vertices[texture_index].u;
@@ -24,9 +23,8 @@ void Model_drawer::draw_triangles(const struct Model* model)
 			y = model->vertices[vertex_index].y;
 			z = model->vertices[vertex_index].z;
 			glVertex3d(x, y, z);
+			}
 		}
-	}
-
 	glEnd();
 }
 
@@ -37,7 +35,6 @@ void Model_drawer::draw_quads(const struct Model* model)
 	float x, y, z, u, v;
 
 	glBegin(GL_QUADS);
-
 	for (i = 0; i < model->n_quads; ++i)
 	{
 		for (k = 0; k < 4; ++k)
@@ -56,7 +53,6 @@ void Model_drawer::draw_quads(const struct Model* model)
 			glVertex3d(x, y, z);
 		}
 	}
-
 	glEnd();
 }
 

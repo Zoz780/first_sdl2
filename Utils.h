@@ -16,5 +16,7 @@ public:
 	double CalcElapsedTime();
 
 	int m_time;
+	int m_num_frames;
+	double elapsed_time_in_secs;
 };
 

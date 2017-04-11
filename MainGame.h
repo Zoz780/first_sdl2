@@ -1,6 +1,6 @@
 #pragma once
 #include <SDL2/SDL.h>
-#include "ModelDrawer.h"
+#include "VboDrawer.h"
 #include "Camera.h"
 #include "Platform.h"
 #include "Utils.h"
@@ -16,7 +16,6 @@ class MainGame
 {
 public:
 	MainGame();
-
 	void Run();
 
 private:
@@ -39,12 +38,9 @@ private:
 	int m_screen_width;
 	int m_screen_hight;
 
-	// Model_drawer raptor;
-    GLuint m_raptor_vbo_id;
-	Model_drawer floor;
-	Model_drawer gun;
-
-    std::vector<VboVertex> m_raptor;
+	VboDrawer raptor;
+	VboDrawer floor;
+	VboDrawer gun;
 
 	Camera camera;
 	Utils utils;

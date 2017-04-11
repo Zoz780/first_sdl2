@@ -8,43 +8,111 @@
 
 // TODO: Add line info to the token array for easier debugging!
 
-std::vector<VboVertex> convert_to_vbo(const Model& model)
+void Model_loader::Load(const char* model_name, double size_x, double size_y, double size_z, const char* texture_name)
 {
-    std::vector<VboVertex> vertices;
-    VboVertex vbo_vertex;
-    for (int i = 0; i < model.n_triangles; ++i) {
-        Triangle* triangle = &model.triangles[i];
-        for (int k = 0; k < 3; ++k) {
+	if (m_vbo_id == 0)
+	{
+		glGenBuffers(1, &m_vbo_id);
+	}
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_id);
+	load_model(model_name, &model);
+	load_texture(texture_name);
+	scale_model(&model, size_x, size_y, size_z);
+	m_vbo_vertex_triangles = convert_triangles_to_vbo(model);
+	m_vbo_vertex_quads = convert_quads_to_vbo(model);
+	m_vbo_vertex_all = m_vbo_vertex_triangles;
+	m_vbo_vertex_all.insert(m_vbo_vertex_all.end(), m_vbo_vertex_quads.begin(), m_vbo_vertex_quads.end());
+	glBufferData(GL_ARRAY_BUFFER, sizeof(VboVertex) * m_vbo_vertex_all.size(), m_vbo_vertex_all.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
 
-            int vertex_index = triangle->points[k].vertex_index;
-            vbo_vertex.x = model.vertices[vertex_index].x;
+GLuint Model_loader::get_texture()
+{
+	return texture;
+}
+
+void Model_loader::load_texture(const char* texture_name)
+{
+	texture = SOIL_load_OGL_texture
+	(
+		texture_name,
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		0
+	);
+
+	if (texture == 0)
+	{
+		cout << "Texture could not loaded (texture missing?) ..\n";
+	}
+	else
+	{
+		cout << "Load texture ..\n";
+	}
+
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
+
+std::vector<VboVertex> convert_triangles_to_vbo(const Model& model)
+{
+	std::vector<VboVertex> vertices;
+	VboVertex vbo_vertex;
+	for (int i = 0; i < model.n_triangles; ++i) {
+		Triangle* triangle = &model.triangles[i];
+		for (int k = 0; k < 3; ++k) {
+
+			int vertex_index = triangle->points[k].vertex_index;
+			vbo_vertex.x = model.vertices[vertex_index].x;
 			vbo_vertex.y = model.vertices[vertex_index].y;
 			vbo_vertex.z = model.vertices[vertex_index].z;
-            vbo_vertex.r = 1.0f;
-            vbo_vertex.g = 1.0f;
-            vbo_vertex.b = 1.0f;
+			vbo_vertex.r = 1.0f;
+			vbo_vertex.g = 1.0f;
+			vbo_vertex.b = 1.0f;
 
-            int texture_index = triangle->points[k].texture_index;
-            GLfloat u = model.texture_vertices[texture_index].u;
-            GLfloat v = model.texture_vertices[texture_index].v;
-            v = 1 - v;
-            /*
-            if (u < 0 || u > 1) {
-                cout << "u = " << u << endl;
-                u = 0.4;
-            }
-            if (v < 0 || v > 1) {
-                cout << "v = " << v << endl;
-                v = 0.4;
-            }
-            */
-            vbo_vertex.u = u;
-            vbo_vertex.v = v;
+			int texture_index = triangle->points[k].texture_index;
+			GLfloat u = model.texture_vertices[texture_index].u;
+			GLfloat v = model.texture_vertices[texture_index].v;
+			v = 1 - v;
+			vbo_vertex.u = u;
+			vbo_vertex.v = v;
 
-            vertices.push_back(vbo_vertex);
-        }
-    }
-    return vertices;
+			vertices.push_back(vbo_vertex);
+		}
+	}
+	return vertices;
+}
+
+std::vector<VboVertex> convert_quads_to_vbo(const Model& model)
+{
+	std::vector<VboVertex> vertices;
+	VboVertex vbo_vertex;
+	for (int i = 0; i < model.n_quads; ++i) {
+		Quad* quad = &model.quads[i];
+		for (int k = 0; k < 4; ++k) {
+
+			int vertex_index = quad->points[k].vertex_index;
+			vbo_vertex.x = model.vertices[vertex_index].x;
+			vbo_vertex.y = model.vertices[vertex_index].y;
+			vbo_vertex.z = model.vertices[vertex_index].z;
+			vbo_vertex.r = 1.0f;
+			vbo_vertex.g = 1.0f;
+			vbo_vertex.b = 1.0f;
+
+			int texture_index = quad->points[k].texture_index;
+			GLfloat u = model.texture_vertices[texture_index].u;
+			GLfloat v = model.texture_vertices[texture_index].v;
+			v = 1 - v;
+			vbo_vertex.u = u;
+			vbo_vertex.v = v;
+
+			vertices.push_back(vbo_vertex);
+		}
+	}
+	return vertices;
 }
 
 int Model_loader::count_tokens(const char* text)

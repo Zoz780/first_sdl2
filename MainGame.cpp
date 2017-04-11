@@ -130,22 +130,17 @@ void MainGame::DrawGame()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	// raptor.draw(0, 5, 100);
-	glBindBuffer(GL_ARRAY_BUFFER, m_raptor_vbo_id);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 32, 0);
-	glDrawArrays(GL_TRIANGLES, 0, m_raptor.size() / 3);
-	glDisableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+	raptor.DrawModel(0, 5, 100);
+	floor.DrawModel(0, 0, 0);
 
-	floor.draw(0, 0, 0);
+	//floor.draw(0, 0, 0);
 
 	glPushMatrix();
 		glRotatef(180.0f, 0, 1, 0);
 		glTranslatef(-m_camera_x_pos, m_camera_y_pos, -m_camera_z_pos);
 		glRotatef(m_camera_y_rot, 0, 1, 0);
 		glRotatef(m_camera_x_rot, 1, 0, 0);
-		gun.draw(+0.03f, -0.07f, -0.1f);
+		gun.DrawModel(+0.03f, -0.07f, -0.1f);
 	glPopMatrix();
 
 	SDL_GL_SwapWindow(m_window);
@@ -153,25 +148,9 @@ void MainGame::DrawGame()
 
 void MainGame::LoadModels()
 {
-	// raptor.load("Models/raptor.obj", 0.5f, "Textures/raptor.png");
-    glGenBuffers(1, &m_raptor_vbo_id);
-
-    cout << "raptor vbo id = " << m_raptor_vbo_id << endl;
-	glBindBuffer(GL_ARRAY_BUFFER, m_raptor_vbo_id);
-
-    Model_loader model_loader;
-    Model model;
-    model_loader.load_model("Models/raptor.obj", &model);
-
-    m_raptor = convert_to_vbo(model);
-    cout << m_raptor[10].x << ", " << m_raptor[14].y << endl;
-    cout << "raptor rows = " << m_raptor.size() << endl;
-    GLfloat* data = (GLfloat*)m_raptor.data();
-	glBufferData(GL_ARRAY_BUFFER, sizeof(VboVertex) * m_raptor.size(), data, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	floor.load("Models/floor.obj", 1.0f, "Textures/floor.jpg");
-	gun.load("Models/gun.obj", 0.2f, "Textures/gun.tga");
+	raptor.Load("Models/raptor.obj", 0.5f, 0.5f, 0.5f, "Textures/raptor.png");
+	floor.Load("Models/floor.obj", 1.0f, 1.0f, 1.0f, "Textures/floor.jpg");
+	gun.Load("Models/gun.obj", 0.2f, 0.2f, 0.2f, "Textures/gun.tga");
 }
 
 void MainGame::CameraMovementHandler(double elapsed_time)

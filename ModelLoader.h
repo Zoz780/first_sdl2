@@ -80,7 +80,8 @@ struct VboVertex
     GLfloat v;
 };
 
-std::vector<VboVertex> convert_to_vbo(const Model& model);
+std::vector<VboVertex> convert_triangles_to_vbo(const Model& model);
+std::vector<VboVertex> convert_quads_to_vbo(const Model& model);
 
 class Model_loader
 {
@@ -92,22 +93,39 @@ public:
 
 	~Model_loader()
 	{
-		//free();
+		if (m_vbo_id != 0)
+		{
+			glDeleteBuffers(1, &m_vbo_id);
+		}
 	}
+
+	void Load(const char* model_name, double size_x, double size_y, double size_z, const char* texture_name);
+
+protected:
+	Model model;
+	GLuint texture;
+	GLuint m_vbo_id;
+	std::vector<VboVertex> m_vbo_vertex_triangles;
+	std::vector<VboVertex> m_vbo_vertex_quads;
+	std::vector<VboVertex> m_vbo_vertex_all;
+	/**
+	* Count the tokens in the text.
+	*/
+	int count_tokens(const char* text);
 
 	/**
 	* Load OBJ model from file.
 	*/
 	int load_model(const char* filename, struct Model* model);
 
-protected:
-	Model model;
-	GLuint texture;
+	GLuint get_texture();
+
+	void load_texture(const char* texture_name);
 
 	/**
-	* Count the tokens in the text.
+	* Scale the loaded model.
 	*/
-	int count_tokens(const char* text);
+	void scale_model(struct Model* model, double sx, double sy, double sz);
 
 	/**
 	* Calculate the length of the token.
@@ -243,11 +261,6 @@ protected:
 	* Print the bounding box of the model.
 	*/
 	void print_bounding_box(const struct Model* model);
-
-	/**
-	* Scale the loaded model.
-	*/
-	void scale_model(struct Model* model, double sx, double sy, double sz);
 
 };
 

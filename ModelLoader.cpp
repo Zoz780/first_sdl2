@@ -8,6 +8,45 @@
 
 // TODO: Add line info to the token array for easier debugging!
 
+std::vector<VboVertex> convert_to_vbo(const Model& model)
+{
+    std::vector<VboVertex> vertices;
+    VboVertex vbo_vertex;
+    for (int i = 0; i < model.n_triangles; ++i) {
+        Triangle* triangle = &model.triangles[i];
+        for (int k = 0; k < 3; ++k) {
+
+            int vertex_index = triangle->points[k].vertex_index;
+            vbo_vertex.x = model.vertices[vertex_index].x;
+			vbo_vertex.y = model.vertices[vertex_index].y;
+			vbo_vertex.z = model.vertices[vertex_index].z;
+            vbo_vertex.r = 1.0f;
+            vbo_vertex.g = 1.0f;
+            vbo_vertex.b = 1.0f;
+
+            int texture_index = triangle->points[k].texture_index;
+            GLfloat u = model.texture_vertices[texture_index].u;
+            GLfloat v = model.texture_vertices[texture_index].v;
+            v = 1 - v;
+            /*
+            if (u < 0 || u > 1) {
+                cout << "u = " << u << endl;
+                u = 0.4;
+            }
+            if (v < 0 || v > 1) {
+                cout << "v = " << v << endl;
+                v = 0.4;
+            }
+            */
+            vbo_vertex.u = u;
+            vbo_vertex.v = v;
+
+            vertices.push_back(vbo_vertex);
+        }
+    }
+    return vertices;
+}
+
 int Model_loader::count_tokens(const char* text)
 {
 	int i = 0;

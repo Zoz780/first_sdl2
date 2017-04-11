@@ -80,13 +80,13 @@ void MainGame::CalculatePlayerDeathTime(double elapsed_time)
 		m_time_until_die -= elapsed_time;
 		if (m_time_until_die <= 0.0f)
 		{
-			cout << "Died!!!\n";
+			// cout << "Died!!!\n";
 		}
 	}
 	else
 	{
 		m_time_until_die = 2.0f;
-		cout << "Alive!!!\n";
+		// cout << "Alive!!!\n";
 	}
 	//cout << m_time_until_die << endl;
 }
@@ -130,7 +130,14 @@ void MainGame::DrawGame()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	raptor.draw(0, 5, 100);
+	// raptor.draw(0, 5, 100);
+	glBindBuffer(GL_ARRAY_BUFFER, m_raptor_vbo_id);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 32, 0);
+	glDrawArrays(GL_TRIANGLES, 0, m_raptor.size() / 3);
+	glDisableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	floor.draw(0, 0, 0);
 
 	glPushMatrix();
@@ -146,7 +153,23 @@ void MainGame::DrawGame()
 
 void MainGame::LoadModels()
 {
-	raptor.load("Models/raptor.obj", 0.5f, "Textures/raptor.png");
+	// raptor.load("Models/raptor.obj", 0.5f, "Textures/raptor.png");
+    glGenBuffers(1, &m_raptor_vbo_id);
+
+    cout << "raptor vbo id = " << m_raptor_vbo_id << endl;
+	glBindBuffer(GL_ARRAY_BUFFER, m_raptor_vbo_id);
+
+    Model_loader model_loader;
+    Model model;
+    model_loader.load_model("Models/raptor.obj", &model);
+
+    m_raptor = convert_to_vbo(model);
+    cout << m_raptor[10].x << ", " << m_raptor[14].y << endl;
+    cout << "raptor rows = " << m_raptor.size() << endl;
+    GLfloat* data = (GLfloat*)m_raptor.data();
+	glBufferData(GL_ARRAY_BUFFER, sizeof(VboVertex) * m_raptor.size(), data, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	floor.load("Models/floor.obj", 1.0f, "Textures/floor.jpg");
 	gun.load("Models/gun.obj", 0.2f, "Textures/gun.tga");
 }

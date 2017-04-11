@@ -7,6 +7,7 @@
 #include <gl/GL.h>
 #include <SOIL.h>
 #include <iostream>
+#include <vector>
 
 #include <string.h>
 
@@ -67,6 +68,19 @@ struct Model
 	struct Quad* quads;
 };
 
+struct VboVertex
+{
+    GLfloat x;
+    GLfloat y;
+    GLfloat z;
+    GLfloat r;
+    GLfloat g;
+    GLfloat b;
+    GLfloat u;
+    GLfloat v;
+};
+
+std::vector<VboVertex> convert_to_vbo(const Model& model);
 
 class Model_loader
 {
@@ -81,6 +95,10 @@ public:
 		//free();
 	}
 
+	/**
+	* Load OBJ model from file.
+	*/
+	int load_model(const char* filename, struct Model* model);
 
 protected:
 	Model model;
@@ -115,11 +133,6 @@ protected:
 	* Release the allocate memory of the token array.
 	*/
 	void free_tokens(struct TokenArray* token_array);
-
-	/**
-	* Load OBJ model from file.
-	*/
-	int load_model(const char* filename, struct Model* model);
 
 	/**
 	* Print the information about the loaded model.

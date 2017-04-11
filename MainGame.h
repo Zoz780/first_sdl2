@@ -39,9 +39,13 @@ private:
 	int m_screen_width;
 	int m_screen_hight;
 
-	Model_drawer raptor;
+	// Model_drawer raptor;
+    GLuint m_raptor_vbo_id;
 	Model_drawer floor;
 	Model_drawer gun;
+
+    std::vector<VboVertex> m_raptor;
+
 	Camera camera;
 	Utils utils;
 	Platform platform;

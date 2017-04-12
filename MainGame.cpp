@@ -5,6 +5,7 @@ using namespace std;
 
 MainGame::MainGame()
 {
+	platform1 = Platform(0, 5, 0, 5, -10, 10, -10, 50);
 	m_window = nullptr;
 	m_screen_width = 1280;
 	m_screen_hight = 720;
@@ -130,17 +131,24 @@ void MainGame::DrawGame()
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	raptor.DrawModel(0, 5, 100);
-	floor.DrawModel(0, 0, 0);
+	// raptor.DrawModel(0, 5, 100);
+	// floor.DrawModel(0, 0, 0);
 
 	//floor.draw(0, 0, 0);
+
+    glBegin(GL_TRIANGLES);
+    glColor3f(1, 1, 0);
+    glVertex3f(0, 0, 0);
+    glVertex3f(10, 0, 0);
+    glVertex3f(0, 10, 0);
+    glEnd(); 
 
 	glPushMatrix();
 		glRotatef(180.0f, 0, 1, 0);
 		glTranslatef(-m_camera_x_pos, m_camera_y_pos, -m_camera_z_pos);
 		glRotatef(m_camera_y_rot, 0, 1, 0);
 		glRotatef(m_camera_x_rot, 1, 0, 0);
-		gun.DrawModel(+0.03f, -0.07f, -0.1f);
+		// gun.DrawModel(+0.03f, -0.07f, -0.1f);
 	glPopMatrix();
 
 	SDL_GL_SwapWindow(m_window);
@@ -324,9 +332,11 @@ void MainGame::GravityHandler(double elapsed_time)
     
     m_velocity_y += m_gravity * elapsed_time;
     m_camera_y_pos += m_velocity_y * elapsed_time;
+    m_ground_height = platform1.GetHeight(m_camera_x_pos, m_camera_z_pos);
+    cout << "Actual height: " << m_ground_height << endl;
 
 	//Bilinear interpolation test code
-	if ((m_camera_z_pos > 30.0f) && (m_camera_z_pos < 50.0f))
+	/*if ((m_camera_z_pos > 30.0f) && (m_camera_z_pos < 50.0f))
 	{
 		m_ground_height = platform.GetHeight(0, 5, 0, 5, -10, 10, 30, 50, m_camera_x_pos, m_camera_z_pos);
 	}
@@ -338,7 +348,7 @@ void MainGame::GravityHandler(double elapsed_time)
 	{
 		m_ground_height = 0.0f;
 	}
-	//Bilinear interpolation test code end
+	//Bilinear interpolation test code end*/
 
     if (m_camera_y_pos <= m_character_height + m_ground_height) {
         m_camera_y_pos = m_character_height + m_ground_height;

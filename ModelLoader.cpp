@@ -24,6 +24,7 @@ void Model_loader::Load(const char* model_name, double size_x, double size_y, do
 	m_vbo_vertex_all.insert(m_vbo_vertex_all.end(), m_vbo_vertex_quads.begin(), m_vbo_vertex_quads.end());
 	glBufferData(GL_ARRAY_BUFFER, sizeof(VboVertex) * m_vbo_vertex_all.size(), m_vbo_vertex_all.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+    cout << "The " << model_name << " has loaded!" << endl;
 }
 
 GLuint Model_loader::get_texture()

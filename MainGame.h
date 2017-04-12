@@ -37,14 +37,14 @@ private:
 	GameState m_game_state;
 	int m_screen_width;
 	int m_screen_hight;
-
+	
 	VboDrawer raptor;
 	VboDrawer floor;
 	VboDrawer gun;
 
 	Camera camera;
 	Utils utils;
-	Platform platform;
+	Platform platform1;
 
 	float m_camera_x_pos;
 	float m_camera_y_pos;

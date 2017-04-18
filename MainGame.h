@@ -1,8 +1,8 @@
 #pragma once
 #include <SDL2/SDL.h>
-#include "VboDrawer.h"
 #include "Camera.h"
-#include "Platform.h"
+//#include "Platform.h"
+#include "Map.h"
 #include "Utils.h"
 #include <glut.h>
 
@@ -24,7 +24,6 @@ private:
 	void GameLoop();
 	void ProcessInput();
 	void DrawGame();
-	void LoadModels();
 	void CameraMovementHandler(double elapsed_time);
 	void MouseMotionHandler();
 	void ProcessKeyPress();
@@ -37,14 +36,13 @@ private:
 	GameState m_game_state;
 	int m_screen_width;
 	int m_screen_hight;
-	
-	VboDrawer raptor;
-	VboDrawer floor;
-	VboDrawer gun;
+
+	Map map;
 
 	Camera camera;
 	Utils utils;
-	Platform platform1;
+	//Platform platform1;
+	//Platform platform2;
 
 	float m_camera_x_pos;
 	float m_camera_y_pos;

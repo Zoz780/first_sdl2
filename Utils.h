@@ -14,9 +14,15 @@ public:
 	float ToRad(float angle_degrees);
 	float ToDegree(float angle_rad);
 	double CalcElapsedTime();
+	void CalculateFrameRate();
+	int GetFPS();
+	char* GetFPString();
 
+private:
+	int m_FPS;
+	char m_strFrameRate[35];
 	int m_time;
-	int m_num_frames;
 	double elapsed_time_in_secs;
+	double m_FrameInterval;
 };
 

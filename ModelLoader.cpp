@@ -17,6 +17,7 @@ void Model_loader::Load(const char* model_name, double size_x, double size_y, do
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_id);
 	load_model(model_name, &model);
 	load_texture(texture_name);
+	print_model_info(&model);
 	scale_model(&model, size_x, size_y, size_z);
 	m_vbo_vertex_triangles = convert_triangles_to_vbo(model);
 	m_vbo_vertex_quads = convert_quads_to_vbo(model);
@@ -24,7 +25,6 @@ void Model_loader::Load(const char* model_name, double size_x, double size_y, do
 	m_vbo_vertex_all.insert(m_vbo_vertex_all.end(), m_vbo_vertex_quads.begin(), m_vbo_vertex_quads.end());
 	glBufferData(GL_ARRAY_BUFFER, sizeof(VboVertex) * m_vbo_vertex_all.size(), m_vbo_vertex_all.data(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-    cout << "The " << model_name << " has loaded!" << endl;
 }
 
 GLuint Model_loader::get_texture()
@@ -44,11 +44,11 @@ void Model_loader::load_texture(const char* texture_name)
 
 	if (texture == 0)
 	{
-		cout << "Texture could not loaded (texture missing?) ..\n";
+		cout << "ERROR: '" << texture_name << "' could not loaded (texture missing?)\n";
 	}
 	else
 	{
-		cout << "Load texture ..\n";
+		cout << "The '" << texture_name << "' has successfully loaded!" << endl;
 	}
 
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -218,6 +218,10 @@ int Model_loader::load_model(const char* filename, struct Model* model)
 	create_arrays(model);
 	printf("Read ..\n");
 	read_elements(obj_file, model);
+	if(obj_file != NULL)
+	{
+		cout << "The '" << filename << "' has loaded!" << endl;
+	}
 
 	return TRUE;
 }
@@ -228,7 +232,7 @@ void Model_loader::print_model_info(const struct Model* model)
 	printf("Texture vertices: %d\n", model->n_texture_vertices);
 	printf("Normals: %d\n", model->n_normals);
 	printf("Triangles: %d\n", model->n_triangles);
-	printf("Quads: %d\n", model->n_quads);
+	printf("Quads: %d\n\n", model->n_quads);
 }
 
 void Model_loader::free_model(struct Model* model)

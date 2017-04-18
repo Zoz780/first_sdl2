@@ -26,13 +26,13 @@ void VboDrawer::DrawModel(float x, float y, float z)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 32, 0);
 	glPushMatrix();
 	glTranslatef(x, y, z);
-	glDrawArrays(GL_TRIANGLES, 0, m_vbo_vertex_triangles.size() / 100);
-	glDrawArrays(GL_QUADS, 0, m_vbo_vertex_quads.size() / 100);
+	glDrawArrays(GL_TRIANGLES, 0, m_vbo_vertex_triangles.size());
+	glDrawArrays(GL_QUADS, 0, m_vbo_vertex_quads.size());
 	glPopMatrix();
 	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    int errorCode = glGetError();
-    cout << "Error: " << x << endl;
+    /*int errorCode = glGetError();
+    cout << "Error: " << x << endl;*/
 }
 

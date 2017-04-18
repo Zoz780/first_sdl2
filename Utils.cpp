@@ -3,7 +3,6 @@
 Utils::Utils()
 {
 	m_time = 0;
-	m_num_frames = 0;
 	elapsed_time_in_secs = 0.0;
 }
 
@@ -39,5 +38,34 @@ double Utils::CalcElapsedTime()
 	}
 
 	return elapsed_time_in_secs;
+}
+
+void Utils::CalculateFrameRate()
+{
+	static float framesPerSecond = 0.0f;
+	static float lastTime = 0.0f;
+	static float frameTime = 0.0f;
+	float currentTime = SDL_GetTicks() * 0.001f;
+
+	m_FrameInterval = currentTime - frameTime;
+	frameTime = currentTime;
+	++framesPerSecond;
+	if (currentTime - lastTime > 1.0f)
+	{
+		lastTime = currentTime;
+		m_FPS = (int)framesPerSecond;
+		sprintf(m_strFrameRate, "FPS Game ---- FPS: %d", m_FPS);
+		framesPerSecond = 0.0f;
+	}
+}
+
+int Utils::GetFPS()
+{
+	return m_FPS;
+}
+
+char* Utils::GetFPString()
+{
+	return m_strFrameRate;
 }
 

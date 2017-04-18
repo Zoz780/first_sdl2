@@ -5,7 +5,9 @@ using namespace std;
 
 MainGame::MainGame()
 {
-	platform1 = Platform(0, 5, 0, 5, -10, 10, -10, 50);
+	//platform1 = Platform(0, 5, 0, 5, -40, 40, 30, 50);
+	//platform2 = Platform(5, 5, 5, 5, -40, 40, 50, 175);
+	map = Map();
 	m_window = nullptr;
 	m_screen_width = 1280;
 	m_screen_hight = 720;
@@ -15,7 +17,7 @@ MainGame::MainGame()
 	m_camera_x_rot = 0;
 	m_camera_y_rot = 0;
 	m_mouse_speed = 0.05;
-	m_movement_speed = 20.0f;
+	m_movement_speed = 40.0f;
 	m_game_state = GameState::PLAY;
     m_gravity = -60.0f;
 	m_ground_height = 0.0f;
@@ -57,7 +59,7 @@ void MainGame::Init()
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 	SDL_GL_SetSwapInterval(0);
-	LoadModels();
+	map.loadModels();
 
 }
 
@@ -111,6 +113,8 @@ void MainGame::DrawGame()
 	glClearDepth(1.0f);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
 	glLoadIdentity();
 	/*moving, rotating*/glMatrixMode(GL_MODELVIEW);
@@ -125,40 +129,21 @@ void MainGame::DrawGame()
 	gluLookAt(m_camera_x_pos, m_camera_y_pos, m_camera_z_pos, cx, cy, cz, 0, 1, 0);/*moving, rotating end*/
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0f, (GLfloat)m_screen_width / (GLfloat)m_screen_hight, 0.01f, 1000.0f);
+	gluPerspective(60.0f, (GLfloat)m_screen_width / (GLfloat)m_screen_hight, 0.01f, 1000.0f);
 	glMatrixMode(GL_MODELVIEW);
 	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-
-	// raptor.DrawModel(0, 5, 100);
-	// floor.DrawModel(0, 0, 0);
-
-	//floor.draw(0, 0, 0);
-
-    glBegin(GL_TRIANGLES);
-    glColor3f(1, 1, 0);
-    glVertex3f(0, 0, 0);
-    glVertex3f(10, 0, 0);
-    glVertex3f(0, 10, 0);
-    glEnd(); 
 
 	glPushMatrix();
 		glRotatef(180.0f, 0, 1, 0);
 		glTranslatef(-m_camera_x_pos, m_camera_y_pos, -m_camera_z_pos);
 		glRotatef(m_camera_y_rot, 0, 1, 0);
 		glRotatef(m_camera_x_rot, 1, 0, 0);
-		// gun.DrawModel(+0.03f, -0.07f, -0.1f);
+		map.DrawGun();
 	glPopMatrix();
 
-	SDL_GL_SwapWindow(m_window);
-}
+	map.DrawObjects();
 
-void MainGame::LoadModels()
-{
-	raptor.Load("Models/raptor.obj", 0.5f, 0.5f, 0.5f, "Textures/raptor.png");
-	floor.Load("Models/floor.obj", 1.0f, 1.0f, 1.0f, "Textures/floor.jpg");
-	gun.Load("Models/gun.obj", 0.2f, 0.2f, 0.2f, "Textures/gun.tga");
+	SDL_GL_SwapWindow(m_window);
 }
 
 void MainGame::CameraMovementHandler(double elapsed_time)
@@ -196,10 +181,10 @@ void MainGame::CameraMovementHandler(double elapsed_time)
 
 	if (camera.needToRun())
 	{
-		m_movement_speed = 30.0f;
+		m_movement_speed = 60.0f;
 	}
 	else
-		m_movement_speed = 20.0f;
+		m_movement_speed = 40.0f;
 	if (camera.needToCrouch())
 	{
 		if (m_character_height >= 2.0f)
@@ -207,7 +192,7 @@ void MainGame::CameraMovementHandler(double elapsed_time)
 			m_character_height -= 12.0f * elapsed_time;
 			//cout << m_character_height << endl;
 		}
-		m_movement_speed = 12.0f;
+		m_movement_speed = 30.0f;
 	}
 	else
 	{
@@ -248,7 +233,7 @@ void MainGame::ProcessKeyPress()
 			break;
 		case SDLK_SPACE:
             if (m_camera_y_pos <= m_character_height + m_ground_height) {
-                m_velocity_y = 16.0f;
+                m_velocity_y = 25.0f;
             }
 			break;
 		case SDLK_ESCAPE:
@@ -332,26 +317,20 @@ void MainGame::GravityHandler(double elapsed_time)
     
     m_velocity_y += m_gravity * elapsed_time;
     m_camera_y_pos += m_velocity_y * elapsed_time;
-    m_ground_height = platform1.GetHeight(m_camera_x_pos, m_camera_z_pos);
-    cout << "Actual height: " << m_ground_height << endl;
+	m_ground_height = 0.0f;
 
-	//Bilinear interpolation test code
-	/*if ((m_camera_z_pos > 30.0f) && (m_camera_z_pos < 50.0f))
+	/*m_ground_height = platform1.GetHeight(m_camera_x_pos, m_camera_z_pos);
+	if (m_camera_z_pos >= 50.0f)
 	{
-		m_ground_height = platform.GetHeight(0, 5, 0, 5, -10, 10, 30, 50, m_camera_x_pos, m_camera_z_pos);
-	}
-	else if (m_camera_z_pos >= 50.0f)
-	{
-		m_ground_height = 5.0f;
-	}
-	else if (m_camera_z_pos <= 30.0f)
-	{
-		m_ground_height = 0.0f;
-	}
-	//Bilinear interpolation test code end*/
+		m_ground_height = platform2.GetHeight(m_camera_x_pos, m_camera_z_pos);
+	}*/
+	//m_ground_height = platform2.GetHeight(m_camera_x_pos, m_camera_z_pos);
+
+    cout << "Actual height: " << m_ground_height << endl;
 
     if (m_camera_y_pos <= m_character_height + m_ground_height) {
         m_camera_y_pos = m_character_height + m_ground_height;
         m_velocity_y = 0.0f;
     }
+
 }

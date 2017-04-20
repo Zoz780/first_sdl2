@@ -27,7 +27,7 @@ bool Platform::IsOnPlatform(float x, float z) const
 		return false;
 }
 
-float Platform::GetHeight(float x, float z)
+float Platform::GetHeight(float x, float z) const
 {
 	if(IsOnPlatform(x,z))
 	{

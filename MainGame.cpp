@@ -7,7 +7,6 @@ MainGame::MainGame()
 {
 	//platform1 = Platform(0, 5, 0, 5, -40, 40, 30, 50);
 	//platform2 = Platform(5, 5, 5, 5, -40, 40, 50, 175);
-	map = Map();
 	m_window = nullptr;
 	m_screen_width = 1280;
 	m_screen_hight = 720;
@@ -24,7 +23,7 @@ MainGame::MainGame()
     m_velocity_y = 0.0f;
 	m_character_height = 3.0f;
 	m_time_until_die = 2.0f;
-	m_ground_height = 0.0f;
+	m_ground_height = -5.0f;
 }
 
 void MainGame::Run()
@@ -59,6 +58,7 @@ void MainGame::Init()
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 	SDL_GL_SetSwapInterval(0);
+	map.loadPlatforms();
 	map.loadModels();
 
 }
@@ -83,13 +83,13 @@ void MainGame::CalculatePlayerDeathTime(double elapsed_time)
 		m_time_until_die -= elapsed_time;
 		if (m_time_until_die <= 0.0f)
 		{
-			// cout << "Died!!!\n";
+			 cout << "Died!!!\n";
 		}
 	}
 	else
 	{
 		m_time_until_die = 2.0f;
-		// cout << "Alive!!!\n";
+		 cout << "Alive!!!\n";
 	}
 	//cout << m_time_until_die << endl;
 }
@@ -181,7 +181,7 @@ void MainGame::CameraMovementHandler(double elapsed_time)
 
 	if (camera.needToRun())
 	{
-		m_movement_speed = 60.0f;
+		m_movement_speed = 50.0f;
 	}
 	else
 		m_movement_speed = 40.0f;
@@ -317,16 +317,19 @@ void MainGame::GravityHandler(double elapsed_time)
     
     m_velocity_y += m_gravity * elapsed_time;
     m_camera_y_pos += m_velocity_y * elapsed_time;
-	m_ground_height = 0.0f;
+	m_ground_height = map.GetPlatformHeight(m_camera_x_pos, m_camera_z_pos);
 
-	/*m_ground_height = platform1.GetHeight(m_camera_x_pos, m_camera_z_pos);
-	if (m_camera_z_pos >= 50.0f)
+	if (m_camera_y_pos > m_character_height + m_ground_height)
 	{
-		m_ground_height = platform2.GetHeight(m_camera_x_pos, m_camera_z_pos);
-	}*/
-	//m_ground_height = platform2.GetHeight(m_camera_x_pos, m_camera_z_pos);
+		if (camera.needToRun())
+		{
+			m_movement_speed = 35.0f;
+		}
+		else
+			m_movement_speed = 25.0f;
+	}
 
-    cout << "Actual height: " << m_ground_height << endl;
+    //cout << "Velocity y: " << m_velocity_y << endl;
 
     if (m_camera_y_pos <= m_character_height + m_ground_height) {
         m_camera_y_pos = m_character_height + m_ground_height;

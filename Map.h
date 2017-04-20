@@ -5,8 +5,14 @@
 #include "Platform.h"
 #include "VboDrawer.h"
 #include "Position.h"
+#include <fstream>
+#include <sstream>
+#include <iostream>
+#include <string>
 
 #include <vector>
+
+using namespace std;
 
 class Map
 {
@@ -33,14 +39,14 @@ public:
 
 	void loadModels();
 
-	void GetPlatformHeight();
+	float GetPlatformHeight(float x, float z);
+
+	/**
+	* Load the platform.
+	*/
+	void loadPlatforms();
 
 protected:
-
-    /**
-     * Load the platform.
-     */
-    void loadPlatforms();
 
 
 private:
@@ -54,7 +60,7 @@ private:
 	VboDrawer floor;
 	VboDrawer gun;
 
-	Platform platform1;
+	Platform platform;
 };
 
 #endif MAP_H

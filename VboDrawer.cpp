@@ -29,6 +29,8 @@ void VboDrawer::DrawModel(float x, float y, float z)
 	glDrawArrays(GL_TRIANGLES, 0, m_vbo_vertex_triangles.size());
 	glDrawArrays(GL_QUADS, 0, m_vbo_vertex_quads.size());
 	glPopMatrix();
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 

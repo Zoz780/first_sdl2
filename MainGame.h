@@ -1,7 +1,7 @@
 #pragma once
 #include <SDL2/SDL.h>
 #include "Camera.h"
-//#include "Platform.h"
+#include "MainMenu.h"
 #include "Map.h"
 #include "Utils.h"
 #include <glut.h>
@@ -9,6 +9,7 @@
 enum class GameState
 {
 	PLAY,
+	MAINMENU,
 	EXIT
 };
 
@@ -38,11 +39,10 @@ private:
 	int m_screen_hight;
 
 	Map map;
+	MainMenu menu;
 
 	Camera camera;
 	Utils utils;
-	//Platform platform1;
-	//Platform platform2;
 
 	float m_camera_x_pos;
 	float m_camera_y_pos;

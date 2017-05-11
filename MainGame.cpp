@@ -5,8 +5,6 @@ using namespace std;
 
 MainGame::MainGame()
 {
-	//platform1 = Platform(0, 5, 0, 5, -40, 40, 30, 50);
-	//platform2 = Platform(5, 5, 5, 5, -40, 40, 50, 175);
 	m_window = nullptr;
 	m_screen_width = 1280;
 	m_screen_hight = 720;
@@ -17,7 +15,7 @@ MainGame::MainGame()
 	m_camera_y_rot = 0;
 	m_mouse_speed = 0.05;
 	m_movement_speed = 40.0f;
-	m_game_state = GameState::PLAY;
+	m_game_state = GameState::MAINMENU;
     m_gravity = -60.0f;
 	m_ground_height = 0.0f;
     m_velocity_y = 0.0f;
@@ -53,13 +51,20 @@ void MainGame::Init()
 	{
 		utils.FatalError("Could not init glew!\n");
 	}
-
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-	SDL_GL_SetSwapInterval(0);
-	map.loadPlatforms();
-	map.loadModels();
+	SDL_GL_SetSwapInterval(1);
+	menu.Init();
+	menu.Load();
+	/*if (m_game_state == GameState::PLAY)
+	{
+		cout << "Ingame\n";
+	}
+	if (m_game_state == GameState::MAINMENU)
+	{
+		cout << "Menu\n";
+	}*/
 
 }
 
@@ -72,7 +77,10 @@ void MainGame::GameLoop()
 
 		ProcessInput();
 		DrawGame();
-		CameraMovementHandler(elapsed_time);
+		if (m_game_state == GameState::PLAY)
+		{
+			CameraMovementHandler(elapsed_time);
+		}
 	}
 }
 
@@ -83,13 +91,13 @@ void MainGame::CalculatePlayerDeathTime(double elapsed_time)
 		m_time_until_die -= elapsed_time;
 		if (m_time_until_die <= 0.0f)
 		{
-			 cout << "Died!!!\n";
+			 //cout << "Died!!!\n";
 		}
 	}
 	else
 	{
 		m_time_until_die = 2.0f;
-		 cout << "Alive!!!\n";
+		 //cout << "Alive!!!\n";
 	}
 	//cout << m_time_until_die << endl;
 }
@@ -110,12 +118,6 @@ void MainGame::ProcessInput()
 
 void MainGame::DrawGame()
 {
-	glClearDepth(1.0f);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-
 	glLoadIdentity();
 	/*moving, rotating*/glMatrixMode(GL_MODELVIEW);
 	float verticalAngle = utils.ToRad(m_camera_x_rot);
@@ -129,19 +131,26 @@ void MainGame::DrawGame()
 	gluLookAt(m_camera_x_pos, m_camera_y_pos, m_camera_z_pos, cx, cy, cz, 0, 1, 0);/*moving, rotating end*/
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(60.0f, (GLfloat)m_screen_width / (GLfloat)m_screen_hight, 0.01f, 1000.0f);
-	glMatrixMode(GL_MODELVIEW);
-	glEnable(GL_TEXTURE_2D);
+	gluPerspective(60.0f, (GLfloat)m_screen_width / (GLfloat)m_screen_hight, 0.01f, 100000.0f);
 
-	glPushMatrix();
-		glRotatef(180.0f, 0, 1, 0);
-		glTranslatef(-m_camera_x_pos, m_camera_y_pos, -m_camera_z_pos);
-		glRotatef(m_camera_y_rot, 0, 1, 0);
-		glRotatef(m_camera_x_rot, 1, 0, 0);
-		map.DrawGun();
-	glPopMatrix();
+	if (m_game_state == GameState::PLAY)
+	{
+		map.DrawObjects();
 
-	map.DrawObjects();
+		glPushMatrix();
+			glRotatef(180.0f, 0, 1, 0);
+			glTranslatef(-m_camera_x_pos, m_camera_y_pos, -m_camera_z_pos);
+			glRotatef(m_camera_y_rot, 0, 1, 0);
+			glRotatef(m_camera_x_rot, 1, 0, 0);
+			map.DrawGun();
+		glPopMatrix();
+	}
+	else if (m_game_state == GameState::MAINMENU)
+	{
+		menu.Draw();
+	}
+
+	//cout << "X: " << m_camera_x_pos << ",  Z:" << m_camera_z_pos << endl;
 
 	SDL_GL_SwapWindow(m_window);
 }
@@ -210,36 +219,61 @@ void MainGame::ProcessKeyPress()
 {
 	if (evnt.type == SDL_KEYDOWN)
 	{
-		//Select surfaces based on key press
-		switch (evnt.key.keysym.sym)
+		if (m_game_state == GameState::PLAY)
 		{
-		case 'w':
-			camera.startGoForward();
-			break;
-		case 's':
-			camera.startGoBackward();
-			break;
-		case 'a':
-			camera.startStrafeLeft();
-			break;
-		case 'd':
-			camera.startStrafeRight();
-			break;
-		case SDLK_LSHIFT:
-			camera.startRun();
-			break;
-		case SDLK_LCTRL:
-			camera.startCrouch();
-			break;
-		case SDLK_SPACE:
-            if (m_camera_y_pos <= m_character_height + m_ground_height) {
-                m_velocity_y = 25.0f;
-            }
-			break;
-		case SDLK_ESCAPE:
-			m_game_state = GameState::EXIT;
-			exit(0);
-			break;
+			//Select surfaces based on key press
+			switch (evnt.key.keysym.sym)
+			{
+			case 'w':
+				camera.startGoForward();
+				break;
+			case 's':
+				camera.startGoBackward();
+				break;
+			case 'a':
+				camera.startStrafeLeft();
+				break;
+			case 'd':
+				camera.startStrafeRight();
+				break;
+			case SDLK_LSHIFT:
+				camera.startRun();
+				break;
+			case SDLK_LCTRL:
+				camera.startCrouch();
+				break;
+			case SDLK_SPACE:
+				if (m_camera_y_pos <= m_character_height + m_ground_height) {
+					m_velocity_y = 25.0f;
+				}
+				break;
+			case SDLK_ESCAPE:
+				m_game_state = GameState::MAINMENU;
+				menu.Init();
+				menu.Load();
+				m_camera_x_pos = 0;
+				m_camera_y_pos = 0;
+				m_camera_z_pos = 0;
+				m_camera_x_rot = 0;
+				m_camera_y_rot = 0;
+				break;
+			}
+		}
+		else if (m_game_state == GameState::MAINMENU)
+		{
+			switch (evnt.key.keysym.sym)
+			{
+			case 13:
+				m_game_state = GameState::PLAY;
+				map.initMap();
+				map.loadPlatforms();
+				map.loadModels();
+				break;
+			case 27:
+				m_game_state = GameState::EXIT;
+				exit(0);
+				break;
+			}
 		}
 	}
 }
@@ -279,19 +313,26 @@ void MainGame::MouseMotionHandler()
 	float m_window_center_y = m_screen_hight / 2;
 
 	if (evnt.type == SDL_MOUSEMOTION)
-	{	
-		SDL_ShowCursor(SDL_DISABLE);
-		SDL_WarpMouseInWindow(m_window, m_window_center_x, m_window_center_y);
-		m_camera_x_rot -= (float)(evnt.motion.y - m_window_center_y) * m_mouse_speed;
-		m_camera_y_rot -= (float)(evnt.motion.x - m_window_center_x) * m_mouse_speed;
+	{
+		if (m_game_state == GameState::PLAY)
+		{
+			SDL_ShowCursor(SDL_DISABLE);
+			SDL_WarpMouseInWindow(m_window, m_window_center_x, m_window_center_y);
+			m_camera_x_rot -= (float)(evnt.motion.y - m_window_center_y) * m_mouse_speed;
+			m_camera_y_rot -= (float)(evnt.motion.x - m_window_center_x) * m_mouse_speed;
 
-		if (m_camera_x_rot >= 87.0f)
-		{
-			m_camera_x_rot = 87.0f;
+			if (m_camera_x_rot >= 87.0f)
+			{
+				m_camera_x_rot = 87.0f;
+			}
+			if (m_camera_x_rot <= -87.0f)
+			{
+				m_camera_x_rot = -87.0f;
+			}
 		}
-		if (m_camera_x_rot <= -87.0f)
+		if (m_game_state == GameState::MAINMENU)
 		{
-			m_camera_x_rot = -87.0f;
+			SDL_ShowCursor(SDL_ENABLE);
 		}
 		//cout << "x: " << m_camera_x_rot << "; y: " << m_camera_y_rot << endl;
 	}

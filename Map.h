@@ -39,6 +39,8 @@ public:
 
 	void loadModels();
 
+	void initMap();
+
 	float GetPlatformHeight(float x, float z);
 
 	/**
@@ -51,6 +53,8 @@ protected:
 
 private:
 
+	void DrawTree(float x, float y, float z, float rotate_y);
+
     /**
      * The platforms for floor collision detection
      */
@@ -59,6 +63,10 @@ private:
 	VboDrawer raptor;
 	VboDrawer floor;
 	VboDrawer gun;
+	VboDrawer ground;
+	VboDrawer tree_upper;
+	VboDrawer tree_lower;
+	VboDrawer skybox;
 
 	Platform platform;
 };

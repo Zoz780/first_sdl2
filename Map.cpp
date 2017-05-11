@@ -37,48 +37,115 @@ void Map::loadPlatforms()
 	file.close();
 }
 
+void Map::initMap()
+{
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthFunc(GL_LESS);
+
+	glEnable(GL_NORMALIZE);
+	glEnable(GL_COLOR_MATERIAL);
+}
+
 void Map::loadModels()
 {
 	raptor.Load("Models/raptor.obj", 0.5f, 0.5f, 0.5f, "Textures/raptor.png");
 	floor.Load("Models/floor.obj", 10.0f, 4.0f, 10.0f, "Textures/floor.jpg");
 	gun.Load("Models/gun.obj", 0.2f, 0.2f, 0.2f, "Textures/gun.tga");
+	ground.Load("Models/ground.obj", 100.0f, 1.0f, 100.0f, "Textures/ground.png");
+	tree_lower.Load("Models/tree_lower.obj", 10.0f, 10.0f, 10.0f, "Textures/tree_lower.jpg");
+	tree_upper.Load("Models/tree_upper.obj", 10.0f, 10.0f, 10.0f, "Textures/tree_upper.png");
+	skybox.Load("Models/skybox.obj", 2000.0f, 2000.0f, 2000.0f, "Textures/skybox.png");
+}
+
+void Map::DrawTree(float x, float y, float z, float rotate_y)
+{
+	glPushMatrix();
+	glTranslatef(x, y, z);
+	glRotatef(rotate_y, 0, 1, 0);
+	tree_lower.DrawModel(0, 0, 0);
+	tree_upper.DrawModel(0, 0, 0);
+	glPopMatrix();
 }
 
 void Map::DrawObjects()
 {
-	raptor.DrawModel(0, 5, 100);
+	glClearDepth(1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
+	glMatrixMode(GL_MODELVIEW);
+	glEnable(GL_TEXTURE_2D);
 
+	//skybox
 	glPushMatrix();
-	for (int i = -90; i < 90; i += 76)
-	{
-		for (int j = -50; j < 27; j += 76)
-		{
-			floor.DrawModel(i, -2.8, j);
-		}
-	}
+	glRotatef(180.0f, 0, 1, 0);
+	skybox.DrawModel(0, 0, 0);
 	glPopMatrix();
 
+	raptor.DrawModel(0, 3.6, 100);
+
+	ground.DrawModel(0, -4, 0);
+
+	DrawTree(95, -5.3, 45, 0);
+	
+	//front
 	glPushMatrix();
-	glTranslatef(-90, -2.8, 30);
+	glTranslatef(-90, -5.3, 30);
 	glRotatef(-15.0f, 1, 0, 0);
 	floor.DrawModel(0,0,0);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(-14, -2.8, 30);
+	glTranslatef(-14, -5.3, 30);
 	glRotatef(-15.0f, 1, 0, 0);
 	floor.DrawModel(0, 0, 0);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(62, -2.8, 30);
+	glTranslatef(62, -5.3, 30);
 	glRotatef(-15.0f, 1, 0, 0);
 	floor.DrawModel(0, 0, 0);
 	glPopMatrix();
 
-	floor.DrawModel(-90, 3.4, 104.5);
-	floor.DrawModel(-14, 3.4, 104.5);
-	floor.DrawModel(62, 3.4, 104.5);
+	//back
+	glPushMatrix();
+	glTranslatef(-90, -12.3, 178);
+	glRotatef(15.0f, 1, 0, 0);
+	floor.DrawModel(0, 0, 0);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-14, -12.3, 178);
+	glRotatef(15.0f, 1, 0, 0);
+	floor.DrawModel(0, 0, 0);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(62, -12.3, 178);
+	glRotatef(15.0f, 1, 0, 0);
+	floor.DrawModel(0, 0, 0);
+	glPopMatrix();
+
+	//left
+	glPushMatrix();
+	glTranslatef(-164.3, -5.9, 105);
+	glRotatef(15.0f, 0, 0, 1);
+	floor.DrawModel(0, 0, 0);
+	glPopMatrix();
+
+	//right
+	glPushMatrix();
+	glTranslatef(135.3, -11.3, 105);
+	glRotatef(-15.0f, 0, 0, 1);
+	floor.DrawModel(0, 0, 0);
+	glPopMatrix();
+
+	floor.DrawModel(-90, 1, 104.5);
+	floor.DrawModel(-14, 1, 104.5);
+	floor.DrawModel(62, 1, 104.5);
 }
 
 void Map::DrawGun()

@@ -8,18 +8,13 @@ MainGame::MainGame()
 	m_window = nullptr;
 	m_screen_width = 1280;
 	m_screen_hight = 720;
-	m_camera_x_pos = 0;
-	m_camera_y_pos = 0;
-	m_camera_z_pos = 0;
-	m_camera_x_rot = 0;
-	m_camera_y_rot = 0;
 	m_mouse_speed = 0.05;
 	m_movement_speed = 40.0f;
 	m_game_state = GameState::MAINMENU;
     m_gravity = -60.0f;
 	m_ground_height = 0.0f;
     m_velocity_y = 0.0f;
-	m_character_height = 3.0f;
+	m_character_height = 8.0f;
 	m_time_until_die = 2.0f;
 	m_ground_height = -5.0f;
 }
@@ -57,15 +52,6 @@ void MainGame::Init()
 	SDL_GL_SetSwapInterval(1);
 	menu.Init();
 	menu.Load();
-	/*if (m_game_state == GameState::PLAY)
-	{
-		cout << "Ingame\n";
-	}
-	if (m_game_state == GameState::MAINMENU)
-	{
-		cout << "Menu\n";
-	}*/
-
 }
 
 void MainGame::GameLoop()
@@ -75,18 +61,18 @@ void MainGame::GameLoop()
 		double elapsed_time;
 		elapsed_time = utils.CalcElapsedTime();
 
-		ProcessInput();
-		DrawGame();
 		if (m_game_state == GameState::PLAY)
 		{
 			CameraMovementHandler(elapsed_time);
 		}
+		ProcessInput();
+		DrawGame();
 	}
 }
 
 void MainGame::CalculatePlayerDeathTime(double elapsed_time)
 {
-	if (camera.needToMove() == false)
+	if (action.needToMove() == false)
 	{
 		m_time_until_die -= elapsed_time;
 		if (m_time_until_die <= 0.0f)
@@ -119,16 +105,10 @@ void MainGame::ProcessInput()
 void MainGame::DrawGame()
 {
 	glLoadIdentity();
-	/*moving, rotating*/glMatrixMode(GL_MODELVIEW);
-	float verticalAngle = utils.ToRad(m_camera_x_rot);
-	float horizontalAngle = utils.ToRad(m_camera_y_rot);
+	glMatrixMode(GL_MODELVIEW);
 
-	float dx = cos(verticalAngle) * sin(horizontalAngle);
-	float dy = sin(verticalAngle);
-	float dz = cos(verticalAngle) * cos(horizontalAngle);
+	camera.set_view_point();
 
-	float cx = m_camera_x_pos + dx, cy = m_camera_y_pos + dy, cz = m_camera_z_pos + dz;
-	gluLookAt(m_camera_x_pos, m_camera_y_pos, m_camera_z_pos, cx, cy, cz, 0, 1, 0);/*moving, rotating end*/
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(60.0f, (GLfloat)m_screen_width / (GLfloat)m_screen_hight, 0.01f, 100000.0f);
@@ -137,11 +117,12 @@ void MainGame::DrawGame()
 	{
 		map.DrawObjects();
 
+		float gun_pose = camera.GetPoseX();
+
 		glPushMatrix();
-			glRotatef(180.0f, 0, 1, 0);
-			glTranslatef(-m_camera_x_pos, m_camera_y_pos, -m_camera_z_pos);
-			glRotatef(m_camera_y_rot, 0, 1, 0);
-			glRotatef(m_camera_x_rot, 1, 0, 0);
+			glTranslatef(camera.GetPosX(), camera.GetPosY(), camera.GetPosZ());
+			glRotatef(camera.GetPoseY(), 0, 0, 1);
+			glRotatef(-gun_pose, 0, 1, 0);
 			map.DrawGun();
 		glPopMatrix();
 	}
@@ -150,51 +131,63 @@ void MainGame::DrawGame()
 		menu.Draw();
 	}
 
-	//cout << "X: " << m_camera_x_pos << ",  Z:" << m_camera_z_pos << endl;
+	//cout << "X: " << camera.GetPosX() << ",  Y:" << camera.GetPosY() << endl;
 
 	SDL_GL_SwapWindow(m_window);
 }
 
 void MainGame::CameraMovementHandler(double elapsed_time)
 {
-	//cout << camera.needToMove() << endl;
-	if (camera.needGoForward()) {
-		m_camera_x_pos += (float)sin(utils.ToRad(m_camera_y_rot)) * m_movement_speed * elapsed_time;
-		m_camera_z_pos += (float)cos(utils.ToRad(m_camera_y_rot)) * m_movement_speed * elapsed_time;
-		camera.playerMoving();
+	double distance;
+	double dx, dy;
+	float slide_speed = 5.0;
+
+	map.HeightMapGrad(camera.GetPosX(), camera.GetPosY(), &dx, &dy);
+
+	float camera_pos_x = camera.GetPosX();
+	float camera_pos_y = camera.GetPosY();
+
+	camera_pos_x -= dx * elapsed_time * slide_speed;
+	camera_pos_y -= dy * elapsed_time * slide_speed;
+
+	camera.SetPosX(camera_pos_x);
+	camera.SetPosY(camera_pos_y);
+
+	distance = elapsed_time * m_movement_speed;
+
+	if (action.needGoForward()) {
+		camera.move_camera_forward(distance);
+		action.playerMoving();
 	}
 	else
 	{
-		camera.playerNotMoving();
+		action.playerNotMoving();
 	}
 
-	if (camera.needGoBackward()) {
-		m_camera_x_pos -= (float)sin(utils.ToRad(m_camera_y_rot)) * m_movement_speed * elapsed_time;
-		m_camera_z_pos -= (float)cos(utils.ToRad(m_camera_y_rot)) * m_movement_speed * elapsed_time;
-		camera.playerMoving();
-	}
-
-
-	if (camera.needStrafeLeft()) {
-		m_camera_x_pos += (float)cos(utils.ToRad(m_camera_y_rot)) * m_movement_speed * elapsed_time;
-		m_camera_z_pos += (float)sin(utils.ToRad(m_camera_y_rot)) * -m_movement_speed * elapsed_time;
-		camera.playerMoving();
+	if (action.needGoBackward()) {
+		camera.move_camera_backward(distance);
+		action.playerMoving();
 	}
 
 
-	if (camera.needStrafeRight()) {
-		m_camera_x_pos -= (float)cos(utils.ToRad(m_camera_y_rot)) * m_movement_speed * elapsed_time;
-		m_camera_z_pos -= (float)sin(utils.ToRad(m_camera_y_rot)) * -m_movement_speed * elapsed_time;
-		camera.playerMoving();
+	if (action.needStrafeLeft()) {
+		camera.step_camera_left(distance);
+		action.playerMoving();
 	}
 
-	if (camera.needToRun())
+
+	if (action.needStrafeRight()) {
+		camera.step_camera_right(distance);
+		action.playerMoving();
+	}
+
+	if (action.needToRun())
 	{
 		m_movement_speed = 50.0f;
 	}
 	else
 		m_movement_speed = 40.0f;
-	if (camera.needToCrouch())
+	if (action.needToCrouch())
 	{
 		if (m_character_height >= 2.0f)
 		{
@@ -211,8 +204,8 @@ void MainGame::CameraMovementHandler(double elapsed_time)
 			//cout << m_character_height << endl;
 		}
 	}
-	CalculatePlayerDeathTime(elapsed_time);
 	GravityHandler(elapsed_time);
+	CalculatePlayerDeathTime(elapsed_time);
 }
 
 void MainGame::ProcessKeyPress()
@@ -225,25 +218,25 @@ void MainGame::ProcessKeyPress()
 			switch (evnt.key.keysym.sym)
 			{
 			case 'w':
-				camera.startGoForward();
+				action.startGoForward();
 				break;
 			case 's':
-				camera.startGoBackward();
+				action.startGoBackward();
 				break;
 			case 'a':
-				camera.startStrafeLeft();
+				action.startStrafeLeft();
 				break;
 			case 'd':
-				camera.startStrafeRight();
+				action.startStrafeRight();
 				break;
 			case SDLK_LSHIFT:
-				camera.startRun();
+				action.startRun();
 				break;
 			case SDLK_LCTRL:
-				camera.startCrouch();
+				action.startCrouch();
 				break;
 			case SDLK_SPACE:
-				if (m_camera_y_pos <= m_character_height + m_ground_height) {
+				if (camera.GetPosZ() <= m_character_height + m_ground_height) {
 					m_velocity_y = 25.0f;
 				}
 				break;
@@ -251,11 +244,11 @@ void MainGame::ProcessKeyPress()
 				m_game_state = GameState::MAINMENU;
 				menu.Init();
 				menu.Load();
-				m_camera_x_pos = 0;
-				m_camera_y_pos = 0;
-				m_camera_z_pos = 0;
-				m_camera_x_rot = 0;
-				m_camera_y_rot = 0;
+				camera.SetPosX(0);
+				camera.SetPosY(0);
+				camera.SetPosZ(0);
+				camera.SetPoseX(0);
+				camera.SetPoseY(0);
 				break;
 			}
 		}
@@ -263,13 +256,7 @@ void MainGame::ProcessKeyPress()
 		{
 			switch (evnt.key.keysym.sym)
 			{
-			case 13:
-				m_game_state = GameState::PLAY;
-				map.initMap();
-				map.loadPlatforms();
-				map.loadModels();
-				break;
-			case 27:
+			case SDLK_ESCAPE:
 				m_game_state = GameState::EXIT;
 				exit(0);
 				break;
@@ -286,22 +273,22 @@ void MainGame::ProcessKeyRelease()
 		switch (evnt.key.keysym.sym)
 		{
 		case 'w':
-			camera.stopForward();
+			action.stopForward();
 			break;
 		case 's':
-			camera.stopBackward();
+			action.stopBackward();
 			break;
 		case 'a':
-			camera.stopStrafeLeft();
+			action.stopStrafeLeft();
 			break;
 		case 'd':
-			camera.stopStrafeRight();
+			action.stopStrafeRight();
 			break;
 		case SDLK_LCTRL:
-			camera.stopCrouch();
+			action.stopCrouch();
 			break;
 		case SDLK_LSHIFT:
-			camera.stopRun();
+			action.stopRun();
 			break;
 		}
 	}
@@ -312,44 +299,86 @@ void MainGame::MouseMotionHandler()
 	float m_window_center_x = m_screen_width / 2;
 	float m_window_center_y = m_screen_hight / 2;
 
-	if (evnt.type == SDL_MOUSEMOTION)
-	{
+	float delta_rotate_y, delta_rotate_x;
+
 		if (m_game_state == GameState::PLAY)
 		{
-			SDL_ShowCursor(SDL_DISABLE);
-			SDL_WarpMouseInWindow(m_window, m_window_center_x, m_window_center_y);
-			m_camera_x_rot -= (float)(evnt.motion.y - m_window_center_y) * m_mouse_speed;
-			m_camera_y_rot -= (float)(evnt.motion.x - m_window_center_x) * m_mouse_speed;
+			if (evnt.type == SDL_MOUSEMOTION)
+			{
+				SDL_ShowCursor(SDL_DISABLE);
+				SDL_WarpMouseInWindow(m_window, m_window_center_x, m_window_center_y);
 
-			if (m_camera_x_rot >= 87.0f)
-			{
-				m_camera_x_rot = 87.0f;
+				delta_rotate_x = evnt.motion.x - m_window_center_x;
+				delta_rotate_y = evnt.motion.y - m_window_center_y;
+
+				camera.rotate_camera(delta_rotate_x, delta_rotate_y, m_mouse_speed);
+
 			}
-			if (m_camera_x_rot <= -87.0f)
+			if (evnt.type == SDL_MOUSEWHEEL)
 			{
-				m_camera_x_rot = -87.0f;
+				if ((evnt.wheel.y == 1) && (m_mouse_speed < 0.5f))
+				{
+					m_mouse_speed += 0.02;
+					//cout << "Mouse speed: " << m_mouse_speed << endl;
+				}
+				else if ((evnt.wheel.y == -1) && (m_mouse_speed > 0.02f))
+				{
+					m_mouse_speed -= 0.02;
+					//cout << "Mouse speed: " << m_mouse_speed << endl;
+				}
+				//cout << "y: " << evnt.wheel.y << endl;
 			}
 		}
 		if (m_game_state == GameState::MAINMENU)
 		{
-			SDL_ShowCursor(SDL_ENABLE);
+			if (evnt.type == SDL_MOUSEMOTION)
+			{
+				SDL_ShowCursor(SDL_ENABLE);
+				//cout << "x:" << evnt.motion.x << ", y:" << evnt.motion.y << endl;
+				if ((evnt.motion.x >= 522) && (evnt.motion.x <= 750) && (evnt.motion.y >= 273) && (evnt.motion.y <= 328))
+				{
+					menu.OnStartButton();
+				}
+				else if ((evnt.motion.x >= 522) && (evnt.motion.x <= 750) && (evnt.motion.y >= 359) && (evnt.motion.y <= 411))
+				{
+					menu.OnQuitButton();
+				}
+				else
+				{
+					menu.DefaultState();
+				}
+			}
+			if (evnt.type == SDL_MOUSEBUTTONUP)
+			{
+				if ((evnt.button.x >= 522) && (evnt.button.x <= 750) && (evnt.button.y >= 273) && (evnt.button.y <= 328))
+				{
+					menu.LoadingScene();
+					m_game_state = GameState::PLAY;
+					map.initMap();
+					if (!map.loadPlatforms())
+					{
+						m_game_state = GameState::MAINMENU;
+					}
+					map.loadModels();
+				}
+				else if ((evnt.button.x >= 522) && (evnt.button.x <= 750) && (evnt.button.y >= 359) && (evnt.button.y <= 411))
+				{
+					m_game_state = GameState::EXIT;
+					exit(0);
+				}
+			}
+			if (evnt.type == SDL_MOUSEBUTTONDOWN)
+			{
+				if ((evnt.button.x >= 522) && (evnt.button.x <= 750) && (evnt.button.y >= 273) && (evnt.button.y <= 328))
+				{
+					menu.LoadingScene();
+				}
+				else
+				{
+					menu.DefaultState();
+				}
+			}
 		}
-		//cout << "x: " << m_camera_x_rot << "; y: " << m_camera_y_rot << endl;
-	}
-	else if (evnt.type == SDL_MOUSEWHEEL)
-	{
-		if ((evnt.wheel.y == 1) && (m_mouse_speed < 0.5f))
-		{
-			m_mouse_speed += 0.02;
-			//cout << "Mouse speed: " << m_mouse_speed << endl;
-		}
-		else if ((evnt.wheel.y == -1) && (m_mouse_speed > 0.02f))
-		{
-			m_mouse_speed -= 0.02;
-			//cout << "Mouse speed: " << m_mouse_speed << endl;
-		}
-		//cout << "y: " << evnt.wheel.y << endl;
-	}
 }
 
 void MainGame::GravityHandler(double elapsed_time)
@@ -357,12 +386,14 @@ void MainGame::GravityHandler(double elapsed_time)
     //cout << elapsed_time << endl;
     
     m_velocity_y += m_gravity * elapsed_time;
-    m_camera_y_pos += m_velocity_y * elapsed_time;
-	m_ground_height = map.GetPlatformHeight(m_camera_x_pos, m_camera_z_pos);
+	float camera_z = camera.GetPosZ();
+	camera_z += m_velocity_y * elapsed_time;
+	camera.SetPosZ(camera_z);
+	m_ground_height = map.GetPlatformHeight(camera.GetPosX(), camera.GetPosY());
 
-	if (m_camera_y_pos > m_character_height + m_ground_height)
+	if (camera.GetPosZ() > m_character_height + m_ground_height)
 	{
-		if (camera.needToRun())
+		if (action.needToRun())
 		{
 			m_movement_speed = 35.0f;
 		}
@@ -372,8 +403,8 @@ void MainGame::GravityHandler(double elapsed_time)
 
     //cout << "Velocity y: " << m_velocity_y << endl;
 
-    if (m_camera_y_pos <= m_character_height + m_ground_height) {
-        m_camera_y_pos = m_character_height + m_ground_height;
+    if (camera.GetPosZ() <= m_character_height + m_ground_height) {
+		camera.SetPosZ(m_character_height + m_ground_height);
         m_velocity_y = 0.0f;
     }
 

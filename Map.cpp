@@ -4,7 +4,7 @@ Map::Map()
 {
 }
 
-void Map::loadPlatforms()
+bool Map::loadPlatforms()
 {
 	ifstream file("Data/platforms.csv");
 	if (file.is_open())
@@ -31,9 +31,13 @@ void Map::loadPlatforms()
 			m_platforms.push_back(platform);
 			cout << endl;
 		}
+		return true;
 	}
 	else
+	{
 		cout << "Cannot find and/or open 'Data/platforms.csv' file!\n";
+		return false;
+	}
 	file.close();
 }
 
@@ -54,19 +58,32 @@ void Map::loadModels()
 	floor.Load("Models/floor.obj", 10.0f, 4.0f, 10.0f, "Textures/floor.jpg");
 	gun.Load("Models/gun.obj", 0.2f, 0.2f, 0.2f, "Textures/gun.tga");
 	ground.Load("Models/ground.obj", 100.0f, 1.0f, 100.0f, "Textures/ground.png");
-	tree_lower.Load("Models/tree_lower.obj", 10.0f, 10.0f, 10.0f, "Textures/tree_lower.jpg");
-	tree_upper.Load("Models/tree_upper.obj", 10.0f, 10.0f, 10.0f, "Textures/tree_upper.png");
+	tree_lower.Load("Models/tree_lower.obj", 20.0f, 20.0f, 20.0f, "Textures/tree_lower.jpg");
+	tree_upper.Load("Models/tree_upper.obj", 20.0f, 20.0f, 20.0f, "Textures/tree_upper.png");
 	skybox.Load("Models/skybox.obj", 2000.0f, 2000.0f, 2000.0f, "Textures/skybox.png");
+	terrain.min_corner.x = 0.0;
+	terrain.min_corner.y = 0.0;
+	terrain.min_corner.z = 0.0;
+	terrain.max_corner.x = 150.0;
+	terrain.max_corner.y = 150.0;
+	terrain.max_corner.z = 50.0;
+	height_map.Load("HeightMaps/terrain1.png", &terrain, "Textures/grass.png");
 }
 
-void Map::DrawTree(float x, float y, float z, float rotate_y)
+void Map::DrawTree(float x, float y, float z, float rotate_z)
 {
 	glPushMatrix();
-	glTranslatef(x, y, z);
-	glRotatef(rotate_y, 0, 1, 0);
+	glRotatef(90, 1, 0, 0);
+	glTranslatef(x, z, y);
+	glRotatef(rotate_z, 0, 1, 0);
 	tree_lower.DrawModel(0, 0, 0);
 	tree_upper.DrawModel(0, 0, 0);
 	glPopMatrix();
+}
+
+void Map::HeightMapGrad(double x, double y, double* dx, double* dy)
+{
+	height_map.calc_height_map_gradient(&terrain, x, y, dx, dy);
 }
 
 void Map::DrawObjects()
@@ -79,90 +96,112 @@ void Map::DrawObjects()
 	glMatrixMode(GL_MODELVIEW);
 	glEnable(GL_TEXTURE_2D);
 
+	glPushMatrix();
+	glTranslatef(-4.1, 0, 0);
+	height_map.DrawHeightMap(&terrain);
+	glPopMatrix();
+
 	//skybox
 	glPushMatrix();
-	glRotatef(180.0f, 0, 1, 0);
+	glRotatef(90.0f, 1, 0, 0);
 	skybox.DrawModel(0, 0, 0);
 	glPopMatrix();
 
-	raptor.DrawModel(0, 3.6, 100);
+	//raptor.DrawModel(0, 3.6, 100);
 
-	ground.DrawModel(0, -4, 0);
-
-	DrawTree(95, -5.3, 45, 0);
-	
-	//front
 	glPushMatrix();
-	glTranslatef(-90, -5.3, 30);
+	glTranslatef(0, 0, 0);
+	glRotatef(90.0f, 1, 0, 0);
+	ground.DrawModel(0, 0, 0);
+	glPopMatrix();
+
+	DrawTree(130, 45, -5.3, 90);
+	
+	/*//front
+	glPushMatrix();
+	glTranslatef(-90, 30, -5.3);
 	glRotatef(-15.0f, 1, 0, 0);
 	floor.DrawModel(0,0,0);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(-14, -5.3, 30);
+	glTranslatef(-14, 30, -5.3);
 	glRotatef(-15.0f, 1, 0, 0);
 	floor.DrawModel(0, 0, 0);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(62, -5.3, 30);
+	glTranslatef(62, 30, -5.3);
 	glRotatef(-15.0f, 1, 0, 0);
 	floor.DrawModel(0, 0, 0);
 	glPopMatrix();
 
 	//back
 	glPushMatrix();
-	glTranslatef(-90, -12.3, 178);
+	glTranslatef(-90, 178, -12.3);
 	glRotatef(15.0f, 1, 0, 0);
 	floor.DrawModel(0, 0, 0);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(-14, -12.3, 178);
+	glTranslatef(-14, 178, -12.3);
 	glRotatef(15.0f, 1, 0, 0);
 	floor.DrawModel(0, 0, 0);
 	glPopMatrix();
 
 	glPushMatrix();
-	glTranslatef(62, -12.3, 178);
+	glTranslatef(62, 178, -12.3);
 	glRotatef(15.0f, 1, 0, 0);
 	floor.DrawModel(0, 0, 0);
 	glPopMatrix();
 
 	//left
 	glPushMatrix();
-	glTranslatef(-164.3, -5.9, 105);
+	glTranslatef(-164.3, 105,  -5.9);
 	glRotatef(15.0f, 0, 0, 1);
 	floor.DrawModel(0, 0, 0);
 	glPopMatrix();
 
 	//right
 	glPushMatrix();
-	glTranslatef(135.3, -11.3, 105);
+	glTranslatef(135.3, 105, -11.3);
 	glRotatef(-15.0f, 0, 0, 1);
 	floor.DrawModel(0, 0, 0);
 	glPopMatrix();
 
-	floor.DrawModel(-90, 1, 104.5);
-	floor.DrawModel(-14, 1, 104.5);
-	floor.DrawModel(62, 1, 104.5);
+	floor.DrawModel(-90, 104.5, 1);
+	floor.DrawModel(-14, 104.5, 1);
+	floor.DrawModel(62, 104.5, 1);*/
 }
 
 void Map::DrawGun()
 {
-	gun.DrawModel(+0.03f, -0.07f, -0.1f);
+	gun.DrawModel(0.1f, -0.03f, -0.07f);
 }
 
 float Map::GetPlatformHeight(float x, float z)
 {
 	float height = -20.0f;
-	for (const Platform& platform : m_platforms) 
+	/*for (const Platform& platform : m_platforms) 
 	{
 		if (platform.IsOnPlatform(x,z))
 		{
 			height = platform.GetHeight(x, z);
 		}
-	}
+	}*/
+
+	height = height_map.get_height_map_height(&terrain, x, z);
+	m_pos_x = x;
+	m_pos_y = z;
 	return height;
+}
+
+float Map::GetPosX()
+{
+	return m_pos_x;
+}
+float Map::GetPosZ()
+{
+	return m_pos_y;
 }
 

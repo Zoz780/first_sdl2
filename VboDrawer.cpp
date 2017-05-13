@@ -10,10 +10,6 @@ VboDrawer::VboDrawer()
 }
 
 
-VboDrawer::~VboDrawer()
-{
-}
-
 void VboDrawer::DrawModel(float x, float y, float z)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_id);
@@ -33,8 +29,5 @@ void VboDrawer::DrawModel(float x, float y, float z)
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    /*int errorCode = glGetError();
-    cout << "Error: " << x << endl;*/
 }
 

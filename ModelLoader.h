@@ -4,7 +4,6 @@
 
 #include <stdio.h>
 #include <glew.h>
-#include <gl/GL.h>
 #include <SOIL.h>
 #include <iostream>
 #include <vector>

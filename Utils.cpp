@@ -23,6 +23,7 @@ void Utils::FatalError(string error)
 	SDL_QUIT;
 }
 
+
 double Utils::CalcElapsedTime()
 {
 	int current_time;

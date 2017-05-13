@@ -1,10 +1,10 @@
 #pragma once
-#include <SDL2/SDL.h>
+#include "Action.h"
 #include "Camera.h"
 #include "MainMenu.h"
 #include "Map.h"
 #include "Utils.h"
-#include <glut.h>
+#include <SDL2/SDL.h>
 
 enum class GameState
 {
@@ -41,14 +41,9 @@ private:
 	Map map;
 	MainMenu menu;
 
+	Action action;
 	Camera camera;
 	Utils utils;
-
-	float m_camera_x_pos;
-	float m_camera_y_pos;
-	float m_camera_z_pos;
-	float m_camera_x_rot;
-	float m_camera_y_rot;
 
 	float m_mouse_speed;
 	float m_movement_speed;

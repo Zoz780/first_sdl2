@@ -1,53 +1,86 @@
 #pragma once
+#include "Vec3.h"
+#include "Utils.h"
+
+class Cam
+{
+public:
+	Vec3 position;
+	Vec3 pose;
+};
+
 class Camera
 {
-
 public:
 	Camera();
 
-	//go Forward
-	void startGoForward();
-	void stopForward();
-	bool needGoForward() const;
+	void SetPosX(float xpos);
+	float GetPosX();
 
-	//go Backward
-	void startGoBackward();
-	void stopBackward();
-	bool needGoBackward() const;
+	void SetPosY(float ypos);
+	float GetPosY();
 
-	//Strafe left
-	void startStrafeLeft();
-	void stopStrafeLeft();
-	bool needStrafeLeft() const;
+	void SetPosZ(float zpos);
+	float GetPosZ();
 
-	//Strafe right
-	void startStrafeRight();
-	void stopStrafeRight();
-	bool needStrafeRight() const;
+	void SetPoseX(float xpose);
+	float GetPoseX();
 
-	//Running
-	void startRun();
-	void stopRun();
-	bool needToRun() const;
+	void SetPoseY(float ypose);
+	float GetPoseY();
 
-	//Crouching
-	void startCrouch();
-	void stopCrouch();
-	bool needToCrouch() const;
+	void SetPoseZ(float zpose);
+	float GetPoseZ();
 
-	//Check the player moving or not
-	void playerMoving();
-	void playerNotMoving();
-	bool needToMove() const;
+	/**
+	* Initialize the camera position and direction.
+	*/
+	void init_camera();
+
+	/**
+	* Transform the models into the view point of the camera.
+	*/
+	void set_view_point();
+
+	/**
+	* Rotate the camera horizontally and vertically.
+	*/
+	void rotate_camera(float delta_rotate_x, float delta_rotate_y, float mouse_speed);
+
+	/**
+	* Move the camera forward.
+	*/
+	void move_camera_forward(double distance);
+
+	/**
+	* Move the camera backward.
+	*/
+	void move_camera_backward(double distance);
+
+	/**
+	* Step the camera left.
+	*/
+	void step_camera_left(double distance);
+
+	/**
+	* Step the camera right.
+	*/
+	void step_camera_right(double distance);
+
+	/**
+	* Move the camera up.
+	*/
+	void move_camera_up(double distance);
+
+	/**
+	* Move the camera down.
+	*/
+	void move_camera_down(double distance);
 
 private:
 
-	bool m_isGoForward;
-	bool m_isGoBackward;
-	bool m_isStrafeLeft;
-	bool m_isStrafeRight;
-	bool m_isRunning;
-	bool m_isCrouching;
-	bool m_one_of_movement_keys_pressed;
+	Cam cam;
+	Utils utils_cam;
+
 };
 

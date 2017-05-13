@@ -2,9 +2,11 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include "Platform.h"
+#include "DrawHeightMapVBO.h"
 #include "VboDrawer.h"
+#include "Platform.h"
 #include "Position.h"
+#include "Utils.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -46,12 +48,19 @@ public:
 	/**
 	* Load the platform.
 	*/
-	void loadPlatforms();
+	bool loadPlatforms();
+
+	float GetPosX();
+	float GetPosZ();
+
+	void HeightMapGrad(double x, double y, double* dx, double* dy);
 
 protected:
 
 
 private:
+
+	struct HeightMap terrain;
 
 	void DrawTree(float x, float y, float z, float rotate_y);
 
@@ -59,6 +68,7 @@ private:
      * The platforms for floor collision detection
      */
     std::vector<Platform> m_platforms;
+	std::vector<HeightMap3D> m_height_maps;
 
 	VboDrawer raptor;
 	VboDrawer floor;
@@ -69,6 +79,11 @@ private:
 	VboDrawer skybox;
 
 	Platform platform;
+	DrawHeightMapVBO height_map;
+	Utils u;
+	
+	float m_pos_x;
+	float m_pos_y;
 };
 
 #endif MAP_H

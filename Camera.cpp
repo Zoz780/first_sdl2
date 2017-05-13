@@ -1,132 +1,149 @@
 #include "Camera.h"
 
+#include <glut.h>
+#include <math.h>
+
 #include <iostream>
 using namespace std;
 
 Camera::Camera()
 {
-	m_isGoForward = false;
-	m_isGoBackward = false;
-	m_isStrafeLeft = false;
-	m_isStrafeRight = false;
-	m_isRunning = false;
-	m_isCrouching = false;
-	m_one_of_movement_keys_pressed = false;
 }
 
-
-//Go forward
-
-void Camera::startGoForward()
+void Camera::SetPosX(float xpos)
 {
-	m_isGoForward = true;
+	cam.position.SetX(xpos);
 }
-
-void Camera::stopForward()
+float Camera::GetPosX()
 {
-	m_isGoForward = false;
+	return cam.position.GetX();
 }
 
-bool Camera::needGoForward() const
+void Camera::SetPosY(float ypos)
 {
-	return m_isGoForward;
+	cam.position.SetY(ypos);
 }
-
-//Go backward
-
-void Camera::startGoBackward()
+float Camera::GetPosY()
 {
-	m_isGoBackward = true;
+	return cam.position.GetY();
 }
 
-void Camera::stopBackward()
+void Camera::SetPosZ(float zpos)
 {
-	m_isGoBackward = false;
+	cam.position.SetZ(zpos);
 }
-
-bool Camera::needGoBackward() const
+float Camera::GetPosZ()
 {
-	return m_isGoBackward;
+	return cam.position.GetZ();
 }
 
-//Strafe left
-
-void Camera::startStrafeLeft()
+void Camera::SetPoseX(float xpose)
 {
-	m_isStrafeLeft = true;
+	cam.pose.SetX(xpose);
 }
-
-void Camera::stopStrafeLeft()
+float Camera::GetPoseX()
 {
-	m_isStrafeLeft = false;
+	return cam.pose.GetX();
 }
 
-bool Camera::needStrafeLeft() const
+void Camera::SetPoseY(float ypose)
 {
-	return m_isStrafeLeft;
+	cam.pose.SetY(ypose);
 }
-
-//Strafe right
-
-void Camera::startStrafeRight()
+float Camera::GetPoseY()
 {
-	m_isStrafeRight = true;
+	return cam.pose.GetY();
 }
 
-void Camera::stopStrafeRight()
+void Camera::SetPoseZ(float zpose)
 {
-	m_isStrafeRight = false;
+	cam.pose.SetZ(zpose);
+}
+float Camera::GetPoseZ()
+{
+	return cam.pose.GetZ();
 }
 
-bool Camera::needStrafeRight() const
+void Camera::init_camera()
 {
-	return m_isStrafeRight;
+	cam.position.x = 0;
+	cam.position.y = 0;
+	cam.position.z = 5;
+
+	cam.pose.x = 0;
+	cam.pose.y = 0;
+	cam.pose.z = 0;
 }
 
-//Running
-
-void Camera::startRun()
+void Camera::set_view_point()
 {
-	m_isRunning = true;
-}
+	float verticalAngle = utils_cam.ToRad(cam.pose.x);
+	float horizontalAngle = utils_cam.ToRad(cam.pose.y);
 
-void Camera::stopRun()
-{
-	m_isRunning = false;
-}
+	float dx = cos(verticalAngle) * cos(horizontalAngle);
+	float dy = cos(verticalAngle) * sin(horizontalAngle);
+	float dz = sin(verticalAngle);
 
-bool Camera::needToRun() const
-{
-	return m_isRunning;
+	float cx = cam.position.x + dx, cy = cam.position.y + dy, cz = cam.position.z + dz;
+	gluLookAt(cam.position.x, cam.position.y, cam.position.z, cx, cy, cz, 0, 0, 1);
 }
 
+void Camera::rotate_camera(float delta_rotate_x, float delta_rotate_y, float mouse_speed)
+{
 
-//Crouching
-void Camera::startCrouch()
-{
-	m_isCrouching = true;
+	cam.pose.x -= (float)(delta_rotate_y)* mouse_speed;
+	cam.pose.y -= (float)(delta_rotate_x)* mouse_speed;
+
+	if (cam.pose.x >= 87.0f)
+	{
+		cam.pose.x = 87.0f;
+	}
+	if (cam.pose.x <= -87.0f)
+	{
+		cam.pose.x = -87.0f;
+	}
 }
 
-void Camera::stopCrouch()
+void Camera::move_camera_forward(double distance)
 {
-	m_isCrouching = false;
+	double angle = utils_cam.ToRad(cam.pose.y);
+
+	cam.position.x += cos(angle) * distance;
+	cam.position.y += sin(angle) * distance;
 }
 
-bool Camera::needToCrouch() const
+void Camera::move_camera_backward(double distance)
 {
-	return m_isCrouching;
+	double angle = utils_cam.ToRad(cam.pose.y);
+
+	cam.position.x -= cos(angle) * distance;
+	cam.position.y -= sin(angle) * distance;
 }
 
-//Check the player moving or not
-void Camera::playerMoving() 
+void Camera::step_camera_left(double distance)
 {
-	m_one_of_movement_keys_pressed = true;
+	double angle = utils_cam.ToRad(cam.pose.y + 90.0);
+
+	cam.position.x += cos(angle) * distance;
+	cam.position.y += sin(angle) * distance;
 }
-void Camera::playerNotMoving()
+
+void Camera::step_camera_right(double distance)
 {
-	m_one_of_movement_keys_pressed = false;
+	double angle = utils_cam.ToRad(cam.pose.y - 90.0);
+
+	cam.position.x += cos(angle) * distance;
+	cam.position.y += sin(angle) * distance;
 }
-bool Camera::needToMove() const
+
+void Camera::move_camera_up(double distance)
 {
-	return m_one_of_movement_keys_pressed;
+	cam.position.z += distance;
 }
+
+void Camera::move_camera_down(double distance)
+{
+	cam.position.z -= distance;
+}
+
+

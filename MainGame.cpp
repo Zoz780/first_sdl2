@@ -11,7 +11,7 @@ MainGame::MainGame()
 	m_mouse_speed = 0.05;
 	m_movement_speed = 40.0f;
 	m_game_state = GameState::MAINMENU;
-    m_gravity = -60.0f;
+    m_gravity = -90.0f;
 	m_ground_height = 0.0f;
     m_velocity_y = 0.0f;
 	m_character_height = 8.0f;
@@ -50,6 +50,7 @@ void MainGame::Init()
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 	SDL_GL_SetSwapInterval(1);
+	SDL_SetWindowFullscreen(m_window, true);
 	menu.Init();
 	menu.Load();
 }
@@ -140,7 +141,7 @@ void MainGame::CameraMovementHandler(double elapsed_time)
 {
 	double distance;
 	double dx, dy;
-	float slide_speed = 5.0;
+	float slide_speed = 10.0;
 
 	map.HeightMapGrad(camera.GetPosX(), camera.GetPosY(), &dx, &dy);
 
@@ -189,18 +190,18 @@ void MainGame::CameraMovementHandler(double elapsed_time)
 		m_movement_speed = 40.0f;
 	if (action.needToCrouch())
 	{
-		if (m_character_height >= 2.0f)
+		if (m_character_height >= 4.0f)
 		{
-			m_character_height -= 12.0f * elapsed_time;
+			m_character_height -= 25.0f * elapsed_time;
 			//cout << m_character_height << endl;
 		}
-		m_movement_speed = 30.0f;
+		m_movement_speed = 15.0f;
 	}
 	else
 	{
-		if (m_character_height <= 3.0f)
+		if (m_character_height <= 8.0f)
 		{
-			m_character_height += 6.0f * elapsed_time;
+			m_character_height += 15.0f * elapsed_time;
 			//cout << m_character_height << endl;
 		}
 	}
@@ -236,8 +237,8 @@ void MainGame::ProcessKeyPress()
 				action.startCrouch();
 				break;
 			case SDLK_SPACE:
-				if (camera.GetPosZ() <= m_character_height + m_ground_height) {
-					m_velocity_y = 25.0f;
+				if (camera.GetPosZ() <= m_character_height + m_ground_height + 0.2) {
+					m_velocity_y = 40.0f;
 				}
 				break;
 			case SDLK_ESCAPE:
@@ -359,6 +360,7 @@ void MainGame::MouseMotionHandler()
 					{
 						m_game_state = GameState::MAINMENU;
 					}
+					map.LoadHeightMaps();
 					map.loadModels();
 				}
 				else if ((evnt.button.x >= 522) && (evnt.button.x <= 750) && (evnt.button.y >= 359) && (evnt.button.y <= 411))

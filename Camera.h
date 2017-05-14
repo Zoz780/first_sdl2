@@ -29,9 +29,6 @@ public:
 	void SetPoseY(float ypose);
 	float GetPoseY();
 
-	void SetPoseZ(float zpose);
-	float GetPoseZ();
-
 	/**
 	* Initialize the camera position and direction.
 	*/

@@ -6,6 +6,8 @@ class DrawHeightMapVBO : public HeightMap3D
 public:
 	DrawHeightMapVBO();
 
-	void DrawHeightMap(const struct HeightMap* height_map);
+	void DrawHeightMap();
+
+	void draw_height_map_old();
 };
 

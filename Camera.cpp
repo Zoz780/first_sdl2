@@ -55,15 +55,6 @@ float Camera::GetPoseY()
 	return cam.pose.GetY();
 }
 
-void Camera::SetPoseZ(float zpose)
-{
-	cam.pose.SetZ(zpose);
-}
-float Camera::GetPoseZ()
-{
-	return cam.pose.GetZ();
-}
-
 void Camera::init_camera()
 {
 	cam.position.x = 0;

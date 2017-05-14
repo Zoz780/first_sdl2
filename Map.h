@@ -6,7 +6,6 @@
 #include "VboDrawer.h"
 #include "Platform.h"
 #include "Position.h"
-#include "Utils.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -41,6 +40,8 @@ public:
 
 	void loadModels();
 
+	void LoadHeightMaps();
+
 	void initMap();
 
 	float GetPlatformHeight(float x, float z);
@@ -50,18 +51,12 @@ public:
 	*/
 	bool loadPlatforms();
 
-	float GetPosX();
-	float GetPosZ();
-
 	void HeightMapGrad(double x, double y, double* dx, double* dy);
 
 protected:
 
 
 private:
-
-	struct HeightMap terrain;
-
 	void DrawTree(float x, float y, float z, float rotate_y);
 
     /**
@@ -80,10 +75,7 @@ private:
 
 	Platform platform;
 	DrawHeightMapVBO height_map;
-	Utils u;
 	
-	float m_pos_x;
-	float m_pos_y;
 };
 
 #endif MAP_H

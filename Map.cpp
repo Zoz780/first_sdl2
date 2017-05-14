@@ -52,6 +52,12 @@ void Map::initMap()
 	glEnable(GL_COLOR_MATERIAL);
 }
 
+void Map::LoadHeightMaps()
+{
+	height_map.Load("HeightMaps/terrain1.png", 150.0, 150.0, 50.0, "Textures/grass.png");
+	m_height_maps.push_back(height_map);
+}
+
 void Map::loadModels()
 {
 	raptor.Load("Models/raptor.obj", 0.5f, 0.5f, 0.5f, "Textures/raptor.png");
@@ -61,13 +67,6 @@ void Map::loadModels()
 	tree_lower.Load("Models/tree_lower.obj", 20.0f, 20.0f, 20.0f, "Textures/tree_lower.jpg");
 	tree_upper.Load("Models/tree_upper.obj", 20.0f, 20.0f, 20.0f, "Textures/tree_upper.png");
 	skybox.Load("Models/skybox.obj", 2000.0f, 2000.0f, 2000.0f, "Textures/skybox.png");
-	terrain.min_corner.x = 0.0;
-	terrain.min_corner.y = 0.0;
-	terrain.min_corner.z = 0.0;
-	terrain.max_corner.x = 150.0;
-	terrain.max_corner.y = 150.0;
-	terrain.max_corner.z = 50.0;
-	height_map.Load("HeightMaps/terrain1.png", &terrain, "Textures/grass.png");
 }
 
 void Map::DrawTree(float x, float y, float z, float rotate_z)
@@ -83,7 +82,7 @@ void Map::DrawTree(float x, float y, float z, float rotate_z)
 
 void Map::HeightMapGrad(double x, double y, double* dx, double* dy)
 {
-	height_map.calc_height_map_gradient(&terrain, x, y, dx, dy);
+	height_map.calc_height_map_gradient(x, y, dx, dy);
 }
 
 void Map::DrawObjects()
@@ -97,8 +96,9 @@ void Map::DrawObjects()
 	glEnable(GL_TEXTURE_2D);
 
 	glPushMatrix();
-	glTranslatef(-4.1, 0, 0);
-	height_map.DrawHeightMap(&terrain);
+	glTranslatef(0, 0, -0.1);
+	height_map.DrawHeightMap();
+	//height_map.draw_height_map_old(&terrain);
 	glPopMatrix();
 
 	//skybox
@@ -181,7 +181,7 @@ void Map::DrawGun()
 
 float Map::GetPlatformHeight(float x, float z)
 {
-	float height = -20.0f;
+	float height = 0.0f;
 	/*for (const Platform& platform : m_platforms) 
 	{
 		if (platform.IsOnPlatform(x,z))
@@ -190,18 +190,14 @@ float Map::GetPlatformHeight(float x, float z)
 		}
 	}*/
 
-	height = height_map.get_height_map_height(&terrain, x, z);
-	m_pos_x = x;
-	m_pos_y = z;
+	for (const HeightMap3D& h : m_height_maps)
+	{
+		if (height_map.is_on_height_map(x, z)) 
+		{
+			height = height_map.get_height_map_height(x, z);
+		}
+	}
 	return height;
 }
 
-float Map::GetPosX()
-{
-	return m_pos_x;
-}
-float Map::GetPosZ()
-{
-	return m_pos_y;
-}
 

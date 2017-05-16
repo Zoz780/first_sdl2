@@ -8,6 +8,13 @@ using namespace std;
 
 Camera::Camera()
 {
+	cam.position.x = 0;
+	cam.position.y = 0;
+	cam.position.z = 0;
+
+	cam.pose.x = 0;
+	cam.pose.y = 0;
+	cam.pose.z = 0;
 }
 
 void Camera::SetPosX(float xpos)
@@ -53,17 +60,6 @@ void Camera::SetPoseY(float ypose)
 float Camera::GetPoseY()
 {
 	return cam.pose.GetY();
-}
-
-void Camera::init_camera()
-{
-	cam.position.x = 0;
-	cam.position.y = 0;
-	cam.position.z = 5;
-
-	cam.pose.x = 0;
-	cam.pose.y = 0;
-	cam.pose.z = 0;
 }
 
 void Camera::set_view_point()
@@ -135,6 +131,26 @@ void Camera::move_camera_up(double distance)
 void Camera::move_camera_down(double distance)
 {
 	cam.position.z -= distance;
+}
+
+void Camera::set_game_area()
+{
+	if (cam.position.x <= 0)
+	{
+		cam.position.x = 0;
+	}
+	if (cam.position.x >= 500)
+	{
+		cam.position.x = 500;
+	}
+	if (cam.position.y <= 0)
+	{
+		cam.position.y = 0;
+	}
+	if (cam.position.y >= 500)
+	{
+		cam.position.y = 500;
+	}
 }
 
 

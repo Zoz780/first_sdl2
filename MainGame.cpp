@@ -12,7 +12,6 @@ MainGame::MainGame()
 	m_movement_speed = 40.0f;
 	m_game_state = GameState::MAINMENU;
     m_gravity = -90.0f;
-	m_ground_height = 0.0f;
     m_velocity_y = 0.0f;
 	m_character_height = 8.0f;
 	m_time_until_die = 2.0f;
@@ -50,7 +49,7 @@ void MainGame::Init()
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 	SDL_GL_SetSwapInterval(1);
-	SDL_SetWindowFullscreen(m_window, true);
+	SDL_SetWindowFullscreen(m_window, GL_FALSE);
 	menu.Init();
 	menu.Load();
 }
@@ -109,6 +108,7 @@ void MainGame::DrawGame()
 	glMatrixMode(GL_MODELVIEW);
 
 	camera.set_view_point();
+	camera.set_game_area();
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -141,7 +141,7 @@ void MainGame::CameraMovementHandler(double elapsed_time)
 {
 	double distance;
 	double dx, dy;
-	float slide_speed = 10.0;
+	float slide_speed = 15.0;
 
 	map.HeightMapGrad(camera.GetPosX(), camera.GetPosY(), &dx, &dy);
 
@@ -362,6 +362,9 @@ void MainGame::MouseMotionHandler()
 					}
 					map.LoadHeightMaps();
 					map.loadModels();
+					camera.SetPosX(423);
+					camera.SetPosY(352);
+					camera.SetPosZ(8);
 				}
 				else if ((evnt.button.x >= 522) && (evnt.button.x <= 750) && (evnt.button.y >= 359) && (evnt.button.y <= 411))
 				{

@@ -33,6 +33,8 @@ private:
 	void CalculatePlayerDeathTime(double elapsed_time);
 
 	SDL_Window* m_window;
+	SDL_Surface *surface;
+	SDL_Cursor *cursor;
 	SDL_Event evnt;
 	GameState m_game_state;
 	int m_screen_width;

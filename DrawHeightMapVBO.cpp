@@ -49,7 +49,7 @@ void DrawHeightMapVBO::draw_height_map_old()
 
 	glScalef(scale_x, scale_y, scale_z);
 	glTranslatef(map.min_corner.x, map.min_corner.y, map.min_corner.z);
-
+	glBindTexture(GL_TEXTURE_2D, GetTexture());
 	for (i = 0; i < map.n_rows - 1; ++i) {
 		glBegin(GL_TRIANGLE_STRIP);
 		for (j = 0; j < map.n_columns; ++j) {

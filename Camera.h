@@ -30,11 +30,6 @@ public:
 	float GetPoseY();
 
 	/**
-	* Initialize the camera position and direction.
-	*/
-	void init_camera();
-
-	/**
 	* Transform the models into the view point of the camera.
 	*/
 	void set_view_point();
@@ -73,6 +68,8 @@ public:
 	* Move the camera down.
 	*/
 	void move_camera_down(double distance);
+
+	void set_game_area();
 
 private:
 

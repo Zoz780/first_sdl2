@@ -88,10 +88,12 @@ std::vector<VboVertex3D> HeightMap3D::convert_map_to_vbo()
 	Vec3 scale;
 	Vec3 normal;
 
-	for (int i = 0; i < map.n_rows - 1; ++i) {
-		for (int j = 0; j < map.n_columns; ++j) {
-			for (int k = 0; k < 2; ++k) {
-
+	for (int i = 0; i < map.n_rows - 1; ++i)
+	{
+		for (int j = 0; j < map.n_columns; ++j)
+		{
+			for (int k = 0; k < 2; ++k) 
+			{
 				row = i + k;
 				x = (double)j / map.n_columns;
 				y = (double)row / map.n_rows;

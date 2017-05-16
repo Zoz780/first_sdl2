@@ -54,7 +54,7 @@ void Map::initMap()
 
 void Map::LoadHeightMaps()
 {
-	height_map.Load("HeightMaps/terrain1.png", 150.0, 150.0, 50.0, "Textures/grass.png");
+	height_map.Load("HeightMaps/terrain3.png", 500.0, 500.0, 25.0, "Textures/grass.png");
 	m_height_maps.push_back(height_map);
 }
 
@@ -63,10 +63,10 @@ void Map::loadModels()
 	raptor.Load("Models/raptor.obj", 0.5f, 0.5f, 0.5f, "Textures/raptor.png");
 	floor.Load("Models/floor.obj", 10.0f, 4.0f, 10.0f, "Textures/floor.jpg");
 	gun.Load("Models/gun.obj", 0.2f, 0.2f, 0.2f, "Textures/gun.tga");
-	ground.Load("Models/ground.obj", 100.0f, 1.0f, 100.0f, "Textures/ground.png");
+	//ground.Load("Models/ground.obj", 100.0f, 1.0f, 100.0f, "Textures/ground.png");
 	tree_lower.Load("Models/tree_lower.obj", 20.0f, 20.0f, 20.0f, "Textures/tree_lower.jpg");
 	tree_upper.Load("Models/tree_upper.obj", 20.0f, 20.0f, 20.0f, "Textures/tree_upper.png");
-	skybox.Load("Models/skybox.obj", 2000.0f, 2000.0f, 2000.0f, "Textures/skybox.png");
+	skybox.Load("Models/skybox.obj", 900.0f, 900.0f, 900.0f, "Textures/skybox.png");
 }
 
 void Map::DrawTree(float x, float y, float z, float rotate_z)
@@ -97,23 +97,26 @@ void Map::DrawObjects()
 
 	glPushMatrix();
 	glTranslatef(0, 0, -0.1);
-	height_map.DrawHeightMap();
-	//height_map.draw_height_map_old(&terrain);
+	//height_map.DrawHeightMap();
+	height_map.draw_height_map_old();
 	glPopMatrix();
 
 	//skybox
 	glPushMatrix();
 	glRotatef(90.0f, 1, 0, 0);
-	skybox.DrawModel(0, 0, 0);
+	skybox.DrawModel(250, 0, -250);
+	glPopMatrix();
+	
+	glPushMatrix();
+	glRotatef(90.0f, 1, 0, 0);
+	raptor.DrawModel(0, 0, 100);
 	glPopMatrix();
 
-	//raptor.DrawModel(0, 3.6, 100);
-
-	glPushMatrix();
+	/*glPushMatrix();
 	glTranslatef(0, 0, 0);
 	glRotatef(90.0f, 1, 0, 0);
 	ground.DrawModel(0, 0, 0);
-	glPopMatrix();
+	glPopMatrix();*/
 
 	DrawTree(130, 45, -5.3, 90);
 	

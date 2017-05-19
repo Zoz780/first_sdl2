@@ -135,21 +135,21 @@ void Camera::move_camera_down(double distance)
 
 void Camera::set_game_area()
 {
-	if (cam.position.x <= 0)
+	if (cam.position.x <= 3)
 	{
-		cam.position.x = 0;
+		cam.position.x = 3;
 	}
-	if (cam.position.x >= 500)
+	if (cam.position.x >= 497)
 	{
-		cam.position.x = 500;
+		cam.position.x = 497;
 	}
-	if (cam.position.y <= 0)
+	if (cam.position.y <= 3)
 	{
-		cam.position.y = 0;
+		cam.position.y = 3;
 	}
-	if (cam.position.y >= 500)
+	if (cam.position.y >= 497)
 	{
-		cam.position.y = 500;
+		cam.position.y = 497;
 	}
 }
 

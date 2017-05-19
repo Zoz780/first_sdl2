@@ -7,7 +7,5 @@ public:
 	DrawHeightMapVBO();
 
 	void DrawHeightMap();
-
-	void draw_height_map_old();
 };
 

@@ -13,11 +13,6 @@ HeightMap3D::HeightMap3D()
 
 void HeightMap3D::Load(const char* height_map_name, double max_corner_x, double max_corner_y, double max_corner_z, const char* texture_name)
 {
-	if (m_vbo_id == 0)
-	{
-		glGenBuffers(1, &m_vbo_id);
-	}
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_id);
 	map.min_corner.x = 0.0;
 	map.min_corner.y = 0.0;
 	map.min_corner.z = 0.0;
@@ -27,7 +22,22 @@ void HeightMap3D::Load(const char* height_map_name, double max_corner_x, double 
 	load_texture(texture_name);
 	load_height_map(height_map_name);
 	m_vbo_vertex_maps = convert_map_to_vbo();
-	glBufferData(GL_ARRAY_BUFFER, sizeof(VboVertex3D) * m_vbo_vertex_maps.size(), m_vbo_vertex_maps.data(), GL_DYNAMIC_DRAW);
+	m_vbo_indices = calculate_indices();
+	if (m_vbo_id == 0)
+	{
+		glGenBuffers(1, &m_vbo_id);
+	}
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo_id);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(VboVertex3D) * m_vbo_vertex_maps.size(), m_vbo_vertex_maps.data(), GL_STATIC_DRAW);
+
+	if (m_vbo_indeices_id == 0)
+	{
+		glGenBuffers(1, &m_vbo_indeices_id);
+	}
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vbo_indeices_id);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * m_vbo_indices.size(), m_vbo_indices.data(), GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -77,6 +87,28 @@ void HeightMap3D::load_texture(const char* filename)
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 }
 
+std::vector<GLuint> HeightMap3D::calculate_indices()
+{
+	std::vector<GLuint> indices;
+	int index = 0;
+
+	for (int i = 0; i < map.n_rows - 1; i++)
+	{
+		for (int j = 0; j < map.n_columns - 1; j++)
+		{
+			indices.push_back(index);
+			indices.push_back(index + 1);
+			indices.push_back(index + map.n_columns);
+			indices.push_back(index + 1);
+			indices.push_back(index + map.n_columns);
+			indices.push_back(index + map.n_columns + 1);
+			index++;
+		}
+		index++;
+	}
+	return indices;
+}
+
 std::vector<VboVertex3D> HeightMap3D::convert_map_to_vbo()
 {
 	std::vector<VboVertex3D> vertices;
@@ -88,28 +120,25 @@ std::vector<VboVertex3D> HeightMap3D::convert_map_to_vbo()
 	Vec3 scale;
 	Vec3 normal;
 
-	for (int i = 0; i < map.n_rows - 1; ++i)
+	for (int i = 0; i < map.n_rows; ++i)
 	{
 		for (int j = 0; j < map.n_columns; ++j)
 		{
-			for (int k = 0; k < 2; ++k) 
-			{
-				row = i + k;
-				x = (double)j / map.n_columns;
-				y = (double)row / map.n_rows;
-				z = (double)get_height_map_value(j, row); 
+			row = i;
+			x = (double)j / map.n_columns;
+			y = (double)row / map.n_rows;
+			z = (double)get_height_map_value(j, row); 
 
-				vbo_vertex.x = x;
-				vbo_vertex.y = y;
-				vbo_vertex.z = z;
-				vbo_vertex.r = 1.0f;
-				vbo_vertex.g = 1.0f;
-				vbo_vertex.b = 1.0f;
-				vbo_vertex.u = x;
-				vbo_vertex.v = y;
+			vbo_vertex.x = x;
+			vbo_vertex.y = y;
+			vbo_vertex.z = z;
+			vbo_vertex.r = 1.0f;
+			vbo_vertex.g = 1.0f;
+			vbo_vertex.b = 1.0f;
+			vbo_vertex.u = x;
+			vbo_vertex.v = y;
 
-				vertices.push_back(vbo_vertex);
-			}
+			vertices.push_back(vbo_vertex);
 		}
 	}
 	return vertices;
@@ -186,7 +215,7 @@ double HeightMap3D::get_height_map_height(double x, double y)
 
 	calc_height_image_position(translated_x, translated_y, &scaled_x, &scaled_y);
 
-	printf("(%lf, %lf)\n", scaled_x, scaled_y);
+	//printf("(%lf, %lf)\n", scaled_x, scaled_y);
 
 	x0 = (int)scaled_x;
 	y0 = (int)scaled_y;

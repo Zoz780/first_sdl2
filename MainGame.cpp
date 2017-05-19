@@ -108,7 +108,6 @@ void MainGame::DrawGame()
 	glMatrixMode(GL_MODELVIEW);
 
 	camera.set_view_point();
-	camera.set_game_area();
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -116,6 +115,7 @@ void MainGame::DrawGame()
 
 	if (m_game_state == GameState::PLAY)
 	{
+		camera.set_game_area();
 		map.DrawObjects();
 
 		float gun_pose = camera.GetPoseX();
@@ -148,8 +148,11 @@ void MainGame::CameraMovementHandler(double elapsed_time)
 	float camera_pos_x = camera.GetPosX();
 	float camera_pos_y = camera.GetPosY();
 
-	camera_pos_x -= dx * elapsed_time * slide_speed;
-	camera_pos_y -= dy * elapsed_time * slide_speed;
+	if (camera.GetPosZ() <= m_ground_height + m_character_height + 3)
+	{
+		camera_pos_x -= dx * elapsed_time * slide_speed;
+		camera_pos_y -= dy * elapsed_time * slide_speed;
+	}
 
 	camera.SetPosX(camera_pos_x);
 	camera.SetPosY(camera_pos_y);
@@ -190,7 +193,7 @@ void MainGame::CameraMovementHandler(double elapsed_time)
 		m_movement_speed = 40.0f;
 	if (action.needToCrouch())
 	{
-		if (m_character_height >= 4.0f)
+		if (m_character_height >= 5.5f)
 		{
 			m_character_height -= 25.0f * elapsed_time;
 			//cout << m_character_height << endl;
@@ -199,7 +202,7 @@ void MainGame::CameraMovementHandler(double elapsed_time)
 	}
 	else
 	{
-		if (m_character_height <= 8.0f)
+		if (m_character_height < 8.0f)
 		{
 			m_character_height += 15.0f * elapsed_time;
 			//cout << m_character_height << endl;
@@ -407,6 +410,7 @@ void MainGame::GravityHandler(double elapsed_time)
 	}
 
     //cout << "Velocity y: " << m_velocity_y << endl;
+	cout << "Z pos: " << camera.GetPosZ() << ", Ground: " << m_ground_height << endl;
 
     if (camera.GetPosZ() <= m_character_height + m_ground_height) {
 		camera.SetPosZ(m_character_height + m_ground_height);

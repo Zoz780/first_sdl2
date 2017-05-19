@@ -80,9 +80,13 @@ protected:
 
 	GLuint texture;
 	GLuint m_vbo_id;
+	GLuint m_vbo_indeices_id;
 	std::vector<VboVertex3D> m_vbo_vertex_maps;
+	std::vector<GLuint> m_vbo_indices;
 
 	std::vector<VboVertex3D> convert_map_to_vbo();
+
+	std::vector<GLuint> calculate_indices();
 
 	void load_texture(const char* filename);
 

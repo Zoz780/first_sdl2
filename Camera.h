@@ -69,6 +69,9 @@ public:
 	*/
 	void move_camera_down(double distance);
 
+	/**
+	* Set the playable area in the game.
+	*/
 	void set_game_area();
 
 private:

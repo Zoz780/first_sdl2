@@ -66,7 +66,7 @@ void Map::loadModels()
 	//ground.Load("Models/ground.obj", 100.0f, 1.0f, 100.0f, "Textures/ground.png");
 	tree_lower.Load("Models/tree_lower.obj", 20.0f, 20.0f, 20.0f, "Textures/tree_lower.jpg");
 	tree_upper.Load("Models/tree_upper.obj", 20.0f, 20.0f, 20.0f, "Textures/tree_upper.png");
-	skybox.Load("Models/skybox.obj", 900.0f, 900.0f, 900.0f, "Textures/skybox.png");
+	skybox.Load("Models/skybox.obj", 2000.0f, 2000.0f, 2000.0f, "Textures/skybox.png");
 }
 
 void Map::DrawTree(float x, float y, float z, float rotate_z)
@@ -97,14 +97,13 @@ void Map::DrawObjects()
 
 	glPushMatrix();
 	glTranslatef(0, 0, -0.1);
-	//height_map.DrawHeightMap();
-	height_map.draw_height_map_old();
+	height_map.DrawHeightMap();
 	glPopMatrix();
 
 	//skybox
 	glPushMatrix();
 	glRotatef(90.0f, 1, 0, 0);
-	skybox.DrawModel(250, 0, -250);
+	skybox.DrawModel(0, 0, 0);
 	glPopMatrix();
 	
 	glPushMatrix();

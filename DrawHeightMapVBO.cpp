@@ -27,6 +27,7 @@ void DrawHeightMapVBO::DrawHeightMap()
 	glDrawElements(GL_TRIANGLES, m_vbo_indices.size(), GL_UNSIGNED_INT, 0);
 	glPopMatrix();
 
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableVertexAttribArray(0);

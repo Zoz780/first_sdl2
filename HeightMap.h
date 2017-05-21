@@ -38,7 +38,7 @@ class HeightMap3D
 public:
 	HeightMap3D();
 
-	void Load(const char* height_map_name, double max_corner_x, double max_corner_y, double max_corner_z, const char* texture_name);
+	bool Load(const char* height_map_name, double max_corner_x, double max_corner_y, double max_corner_z, const char* texture_name);
 
 	/**
 	* Check the bounding rect of the height map.
@@ -74,6 +74,11 @@ public:
 	*/
 	void calc_height_map_gradient(double x, double y, double* dx, double* dy);
 
+	/**
+	* Free the allocated memory.
+	*/
+	void free_height_map();
+
 protected:
 	HeightMap map;
 	VboVertex3D vbo_3d;
@@ -88,18 +93,13 @@ protected:
 
 	std::vector<GLuint> calculate_indices();
 
-	void load_texture(const char* filename);
+	bool load_texture(const char* filename);
 
 	GLuint GetTexture();
 	/**
 	* Load height map from image file.
 	*/
-	void load_height_map(const char* filename);
-
-	/**
-	* Free the allocated memory.
-	*/
-	void free_height_map();
+	bool load_height_map(const char* filename);
 
 	/**
 	* Calculate the position on image coordinate system.

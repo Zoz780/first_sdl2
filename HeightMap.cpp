@@ -11,7 +11,7 @@ HeightMap3D::HeightMap3D()
 {
 }
 
-void HeightMap3D::Load(const char* height_map_name, double max_corner_x, double max_corner_y, double max_corner_z, const char* texture_name)
+bool HeightMap3D::Load(const char* height_map_name, double max_corner_x, double max_corner_y, double max_corner_z, const char* texture_name)
 {
 	map.min_corner.x = 0.0;
 	map.min_corner.y = 0.0;
@@ -19,8 +19,14 @@ void HeightMap3D::Load(const char* height_map_name, double max_corner_x, double 
 	map.max_corner.x = max_corner_x;
 	map.max_corner.y = max_corner_y;
 	map.max_corner.z = max_corner_z;
-	load_texture(texture_name);
-	load_height_map(height_map_name);
+	if (!load_height_map(height_map_name))
+	{
+		return false;
+	}
+	if (!load_texture(texture_name))
+	{
+		return false;
+	}
 	m_vbo_vertex_maps = convert_map_to_vbo();
 	m_vbo_indices = calculate_indices();
 	if (m_vbo_id == 0)
@@ -39,6 +45,7 @@ void HeightMap3D::Load(const char* height_map_name, double max_corner_x, double 
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	return true;
 }
 
 
@@ -59,32 +66,33 @@ GLuint HeightMap3D::GetTexture()
 	return texture;
 }
 
-void HeightMap3D::load_texture(const char* filename)
+bool HeightMap3D::load_texture(const char* filename)
 {
-	Pixel* image;
-	int width;
-	int height;
-
-	glGenTextures(1, &texture);
-
-	image = (Pixel*)SOIL_load_image(filename, &width, &height, 0, SOIL_LOAD_RGB);
+	texture = SOIL_load_OGL_texture
+	(
+		filename,
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID,
+		0
+	);
 
 	if (texture == 0)
 	{
 		cout << "ERROR: '" << filename << "' could not loaded (texture missing?)\n";
+		return false;
 	}
 	else
 	{
 		cout << "The '" << filename << "' has successfully loaded!" << endl;
+		return true;
 	}
 
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, (Pixel*)image);
-
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	return true;
 }
 
 std::vector<GLuint> HeightMap3D::calculate_indices()
@@ -145,7 +153,7 @@ std::vector<VboVertex3D> HeightMap3D::convert_map_to_vbo()
 }
 
 
-void HeightMap3D::load_height_map(const char* filename)
+bool HeightMap3D::load_height_map(const char* filename)
 {
 	Pixel* image;
 	int width;
@@ -156,7 +164,7 @@ void HeightMap3D::load_height_map(const char* filename)
 	image = (Pixel*)SOIL_load_image(filename, &width, &height, 0, SOIL_LOAD_RGB);
 	if (image == NULL) {
 		printf("ERROR: Unable to load the height map from \"%s\" image file!\n", filename);
-		return;
+		return false;
 	}
 
 	map.n_rows = height;
@@ -164,6 +172,7 @@ void HeightMap3D::load_height_map(const char* filename)
 
 	load_height_map_values(image);
 	calc_height_map_normals();
+	return true;
 }
 
 void HeightMap3D::check_height_map_bounding_rect()
@@ -364,5 +373,7 @@ void HeightMap3D::calc_height_map_gradient(double x, double y, double* dx, doubl
 void HeightMap3D::free_height_map()
 {
 	// TODO: Free the allocated memory!
+	free(map.heights);
+	free(map.normals);
 }
 

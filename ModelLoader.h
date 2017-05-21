@@ -98,7 +98,7 @@ public:
 		}
 	}
 
-	void Load(const char* model_name, double size_x, double size_y, double size_z, const char* texture_name);
+	bool Load(const char* model_name, double size_x, double size_y, double size_z, const char* texture_name);
 
 protected:
 	Model model;

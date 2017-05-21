@@ -30,7 +30,6 @@ public:
 	void DefaultState();
 
 private:
-
 	VboDrawer menu;
 	VboDrawer loading_scene;
 	VboDrawer marker;

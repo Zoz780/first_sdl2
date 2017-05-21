@@ -38,9 +38,11 @@ public:
 
 	void DrawObjects();
 
-	void loadModels();
+	bool loadModels();
 
-	void LoadHeightMaps();
+	bool LoadHeightMaps();
+
+	void FreeHeightMaps();
 
 	void initMap();
 

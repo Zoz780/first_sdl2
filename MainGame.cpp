@@ -16,6 +16,8 @@ MainGame::MainGame()
 	m_character_height = 8.0f;
 	m_time_until_die = 2.0f;
 	m_ground_height = -5.0f;
+	m_time_bw_steps = 0.3;
+	m_select_loop = 0;
 }
 
 void MainGame::Run()
@@ -33,23 +35,41 @@ void MainGame::Init()
 	{
 		utils.FatalError("The SDL window could not be created!\n");
 	}
+	else
+		cout << "The SDL window is created!\n";
 
 	SDL_GLContext glContext = SDL_GL_CreateContext(m_window);
 	if (glContext == nullptr)
 	{
 		utils.FatalError("The SDL_GL context could not be created!\n");
 	}
+	else
+		cout << "The SDL_GL context window is created!\n";
 
 	GLenum error = glewInit();
 	if (error != GLEW_OK)
 	{
 		utils.FatalError("Could not init glew!\n");
 	}
+	else
+		cout << "Glew is initalized!\n";
+
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+
+	cursor = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
+	SDL_SetCursor(cursor);
+
 	SDL_GL_SetSwapInterval(1);
-	SDL_SetWindowFullscreen(m_window, GL_FALSE);
+	SDL_SetWindowFullscreen(m_window, GL_TRUE);
+	if((!sound.Init()) || (!sound.Load()))
+	{
+		utils.FatalError("Could not load or missing audio files!");
+	}
+	else
+		cout << "All audio files loaded sucessfully!\n";
+	sound.PlayMenuMusic();
 	menu.Init();
 	menu.Load();
 }
@@ -98,7 +118,7 @@ void MainGame::ProcessInput()
 		}
 		ProcessKeyPress();
 		ProcessKeyRelease();
-		MouseMotionHandler();
+		MouseMotionHandler();	
 	}
 }
 
@@ -139,16 +159,16 @@ void MainGame::DrawGame()
 
 void MainGame::CameraMovementHandler(double elapsed_time)
 {
-	double distance;
+	double distance, sound_lateness;
 	double dx, dy;
-	float slide_speed = 15.0;
+	float slide_speed = 15.0f;
 
 	map.HeightMapGrad(camera.GetPosX(), camera.GetPosY(), &dx, &dy);
 
 	float camera_pos_x = camera.GetPosX();
 	float camera_pos_y = camera.GetPosY();
 
-	if (camera.GetPosZ() <= m_ground_height + m_character_height + 3)
+	if (camera.GetPosZ() <= m_ground_height + m_character_height + 4)
 	{
 		camera_pos_x -= dx * elapsed_time * slide_speed;
 		camera_pos_y -= dy * elapsed_time * slide_speed;
@@ -158,6 +178,36 @@ void MainGame::CameraMovementHandler(double elapsed_time)
 	camera.SetPosY(camera_pos_y);
 
 	distance = elapsed_time * m_movement_speed;
+
+	if (((action.needGoForward()) || (action.needGoBackward()) || (action.needStrafeLeft()) || (action.needStrafeRight())) 
+		&& (camera.GetPosZ() <= m_ground_height + m_character_height + 0.4) 
+		&& (!action.needToCrouch()))
+	{
+		if (action.needToRun())
+		{
+			if (m_time_bw_steps < 0.25)
+			{
+				m_time_bw_steps += elapsed_time;
+			}
+			else
+			{
+				sound.PlaySteps();
+				m_time_bw_steps = 0.0;
+			}
+		}
+		else
+		{
+			if (m_time_bw_steps < 0.3)
+			{
+				m_time_bw_steps += elapsed_time;
+			}
+			else
+			{
+				sound.PlaySteps();
+				m_time_bw_steps = 0.0;
+			}
+		}
+	}
 
 	if (action.needGoForward()) {
 		camera.move_camera_forward(distance);
@@ -233,6 +283,12 @@ void MainGame::ProcessKeyPress()
 			case 'd':
 				action.startStrafeRight();
 				break;
+			case SDLK_KP_PLUS:
+				sound.VolumeUp();
+				break;
+			case SDLK_KP_MINUS:
+				sound.VolumeDown();
+				break;
 			case SDLK_LSHIFT:
 				action.startRun();
 				break;
@@ -253,6 +309,9 @@ void MainGame::ProcessKeyPress()
 				camera.SetPosZ(0);
 				camera.SetPoseX(0);
 				camera.SetPoseY(0);
+				map.FreeHeightMaps();
+				sound.StopMusic();
+				sound.PlayMenuMusic();
 				break;
 			}
 		}
@@ -260,6 +319,12 @@ void MainGame::ProcessKeyPress()
 		{
 			switch (evnt.key.keysym.sym)
 			{
+			case SDLK_KP_PLUS:
+				sound.MenuVolumeUp();
+				break;
+			case SDLK_KP_MINUS:
+				sound.MenuVolumeDown();
+				break;
 			case SDLK_ESCAPE:
 				m_game_state = GameState::EXIT;
 				exit(0);
@@ -341,14 +406,25 @@ void MainGame::MouseMotionHandler()
 				//cout << "x:" << evnt.motion.x << ", y:" << evnt.motion.y << endl;
 				if ((evnt.motion.x >= 522) && (evnt.motion.x <= 750) && (evnt.motion.y >= 273) && (evnt.motion.y <= 328))
 				{
+					m_select_loop++;
 					menu.OnStartButton();
+					if (m_select_loop == 1)
+					{
+						sound.PlayMenuSelectSound();
+					}
 				}
 				else if ((evnt.motion.x >= 522) && (evnt.motion.x <= 750) && (evnt.motion.y >= 359) && (evnt.motion.y <= 411))
 				{
+					m_select_loop++;
 					menu.OnQuitButton();
+					if (m_select_loop == 1)
+					{
+						sound.PlayMenuSelectSound();
+					}
 				}
 				else
 				{
+					m_select_loop = 0;
 					menu.DefaultState();
 				}
 			}
@@ -359,15 +435,17 @@ void MainGame::MouseMotionHandler()
 					menu.LoadingScene();
 					m_game_state = GameState::PLAY;
 					map.initMap();
-					if (!map.loadPlatforms())
+					/*if (!map.loadPlatforms())
 					{
 						m_game_state = GameState::MAINMENU;
-					}
+					}*/
 					map.LoadHeightMaps();
 					map.loadModels();
 					camera.SetPosX(423);
 					camera.SetPosY(352);
 					camera.SetPosZ(8);
+					sound.StopMusic();
+					sound.PlayIngameMusic();
 				}
 				else if ((evnt.button.x >= 522) && (evnt.button.x <= 750) && (evnt.button.y >= 359) && (evnt.button.y <= 411))
 				{
@@ -410,7 +488,7 @@ void MainGame::GravityHandler(double elapsed_time)
 	}
 
     //cout << "Velocity y: " << m_velocity_y << endl;
-	cout << "Z pos: " << camera.GetPosZ() << ", Ground: " << m_ground_height << endl;
+	//cout << "Z pos: " << camera.GetPosZ() << ", Ground: " << m_ground_height << endl;
 
     if (camera.GetPosZ() <= m_character_height + m_ground_height) {
 		camera.SetPosZ(m_character_height + m_ground_height);

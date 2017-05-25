@@ -47,6 +47,7 @@ void Map::initMap()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_LESS);
+	glShadeModel(GL_SMOOTH);
 
 	glEnable(GL_NORMALIZE);
 	glEnable(GL_COLOR_MATERIAL);
@@ -54,7 +55,7 @@ void Map::initMap()
 
 bool Map::LoadHeightMaps()
 {
-	if (!height_map.Load("HeightMaps/terrain3.png", 500.0, 500.0, 25.0, "Textures/grass.png"))
+	if (!height_map.Load("HeightMaps/terrain3.png", 500.0, 500.0, 25.0, "Textures/grass.jpg"))
 	{
 		return false;
 	}
@@ -77,6 +78,7 @@ bool Map::loadModels()
 	tree_lower.Load("Models/tree_lower.obj", 20.0f, 20.0f, 20.0f, "Textures/tree_lower.jpg");
 	tree_upper.Load("Models/tree_upper.obj", 20.0f, 20.0f, 20.0f, "Textures/tree_upper.png");
 	skybox.Load("Models/skybox.obj", 900.0f, 900.0f, 900.0f, "Textures/skybox.png");
+	mountain.Load("Models/mountain.obj", 50.0f, 50.0f, 50.0f, "Textures/mountain.png");
 	return true;
 }
 
@@ -84,7 +86,7 @@ void Map::DrawTree(float x, float y, float z, float rotate_z)
 {
 	glPushMatrix();
 	glRotatef(90, 1, 0, 0);
-	glTranslatef(x, z, y);
+	glTranslatef(x, z, -y);
 	glRotatef(rotate_z, 0, 1, 0);
 	tree_lower.DrawModel(0, 0, 0);
 	tree_upper.DrawModel(0, 0, 0);
@@ -106,6 +108,8 @@ void Map::DrawObjects()
 	glMatrixMode(GL_MODELVIEW);
 	glEnable(GL_TEXTURE_2D);
 
+	materal.SetMaterial();
+
 	glPushMatrix();
 	glTranslatef(0, 0, -0.1);
 	height_map.DrawHeightMap();
@@ -114,15 +118,40 @@ void Map::DrawObjects()
 	//skybox
 	glPushMatrix();
 	glRotatef(90.0f, 1, 0, 0);
-	skybox.DrawModel(250, 0, -250);
+	skybox.DrawModel(250, -3, -250);
 	glPopMatrix();
+
+	//mountains
+	mountain.DrawModel(-80, -210, -3);
+	mountain.DrawModel(150, -210, -3);
+	mountain.DrawModel(450, -210, -3);
+	mountain.DrawModel(650, -210, -15);
+
+	mountain.DrawModel(750, -40, -3);
+	mountain.DrawModel(750, 150, -3);
+	mountain.DrawModel(750, 350, -20);
+	mountain.DrawModel(750, 550, -50);
 	
 	glPushMatrix();
 	glRotatef(90.0f, 1, 0, 0);
 	raptor.DrawModel(0, 0, 100);
 	glPopMatrix();
 
-	DrawTree(130, 45, -5.3, 90);
+	DrawTree(495, 392, 10, 0);
+	DrawTree(480, 285, 10, 0);
+
+	DrawTree(233, 142, 12, 0);
+	DrawTree(186, 186, 15, 0);
+	DrawTree(141, 340, 13, 0);
+	DrawTree(182, 195, 11, 0);
+	DrawTree(194, 182.5, 13, 0);
+	DrawTree(228, 267, 10, 0);
+
+	DrawTree(0, 0, 10, 0);
+	DrawTree(505, 10, 13, 0);
+	DrawTree(274.5, 321, 20, 90);
+	DrawTree(339, 500, 15, 0);
+	DrawTree(72, 500, 13, 0);
 	
 }
 

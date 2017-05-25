@@ -152,7 +152,7 @@ void MainGame::DrawGame()
 		menu.Draw();
 	}
 
-	//cout << "X: " << camera.GetPosX() << ",  Y:" << camera.GetPosY() << endl;
+	cout << "X: " << camera.GetPosX() << ",  Y:" << camera.GetPosY() << endl;
 
 	SDL_GL_SwapWindow(m_window);
 }

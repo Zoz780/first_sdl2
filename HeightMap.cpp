@@ -73,17 +73,18 @@ bool HeightMap3D::load_texture(const char* filename)
 		filename,
 		SOIL_LOAD_AUTO,
 		SOIL_CREATE_NEW_ID,
+		//SOIL_FLAG_MIPMAPS | SOIL_FLAG_POWER_OF_TWO
 		0
 	);
 
 	if (texture == 0)
 	{
-		cout << "ERROR: '" << filename << "' could not loaded (texture missing?)\n";
+		cout << "ERROR: '" << filename << "' could not loaded (texture missing?)\n\n";
 		return false;
 	}
 	else
 	{
-		cout << "The '" << filename << "' has successfully loaded!" << endl;
+		cout << "The '" << filename << "' has successfully loaded!\n" << endl;
 		return true;
 	}
 
@@ -163,8 +164,12 @@ bool HeightMap3D::load_height_map(const char* filename)
 
 	image = (Pixel*)SOIL_load_image(filename, &width, &height, 0, SOIL_LOAD_RGB);
 	if (image == NULL) {
-		printf("ERROR: Unable to load the height map from \"%s\" image file!\n", filename);
+		cout << "ERROR: '" << filename << "' could not loaded (image missing?)\n\n";
 		return false;
+	}
+	else
+	{
+		cout << "The '" << filename << "' has successfully loaded!\n" << endl;
 	}
 
 	map.n_rows = height;

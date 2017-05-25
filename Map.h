@@ -6,6 +6,7 @@
 #include "VboDrawer.h"
 #include "Platform.h"
 #include "Position.h"
+#include "Materials.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -74,8 +75,10 @@ private:
 	VboDrawer tree_upper;
 	VboDrawer tree_lower;
 	VboDrawer skybox;
+	VboDrawer mountain;
 
 	Platform platform;
+	Materials materal;
 	DrawHeightMapVBO height_map;
 	
 };

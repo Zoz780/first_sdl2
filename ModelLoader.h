@@ -85,18 +85,9 @@ std::vector<VboVertex> convert_quads_to_vbo(const Model& model);
 class Model_loader
 {
 public:
-	Model_loader()
-	{
-		memset(&model, 0, sizeof(model));
-	}
+	Model_loader();
 
-	~Model_loader()
-	{
-		if (m_vbo_id != 0)
-		{
-			glDeleteBuffers(1, &m_vbo_id);
-		}
-	}
+	~Model_loader();
 
 	bool Load(const char* model_name, double size_x, double size_y, double size_z, const char* texture_name);
 

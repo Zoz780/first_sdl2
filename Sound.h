@@ -17,6 +17,10 @@ public:
 
 	void PlayIngameMusic();
 
+	void PlayTrappedSound();
+
+	void PlayPlayerDieSound();
+
 	void StopMusic();
 
 	void PlaySteps();
@@ -40,6 +44,8 @@ private:
 	Mix_Music *ingame_bgm;
 
 	Mix_Chunk *step;
+	Mix_Chunk *get_trapped;
+	Mix_Chunk *player_death;
 	Mix_Chunk *menu_select;
 };
 

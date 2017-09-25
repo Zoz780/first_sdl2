@@ -32,8 +32,10 @@ bool Sound::Load()
 
 	step = Mix_LoadWAV("Sound/grass_run_04.wav");
 	menu_select = Mix_LoadWAV("Sound/selection.wav");
+	get_trapped = Mix_LoadWAV("Sound/trap1.wav");
+	player_death = Mix_LoadWAV("Sound/trap2.wav");
 
-	if ((step == NULL) || (menu_select == NULL))
+	if ((step == NULL) || (menu_select == NULL) || (get_trapped == NULL) || (player_death == NULL))
 	{
 		return false;
 	}
@@ -56,6 +58,18 @@ void Sound::PlayMenuMusic()
 {
 	Mix_PlayMusic(menu_bgm, -1);
 	Mix_VolumeMusic(m_menu_volume);
+}
+
+void Sound::PlayTrappedSound()
+{
+	Mix_PlayChannel(2, get_trapped, 0);
+	Mix_Volume(2, m_volume);
+}
+
+void Sound::PlayPlayerDieSound()
+{
+	Mix_PlayChannel(3, player_death, 0);
+	Mix_Volume(3, m_volume * 0.8);
 }
 
 void Sound::StopMusic()

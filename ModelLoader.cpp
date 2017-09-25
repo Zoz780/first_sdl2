@@ -8,6 +8,22 @@
 
 // TODO: Add line info to the token array for easier debugging!
 
+Model_loader::Model_loader()
+{
+	memset(&model, 0, sizeof(model));
+	texture = 0;
+	m_vbo_id = 0;
+}
+
+Model_loader::~Model_loader()
+{
+	if (m_vbo_id != 0)
+	{
+		glDeleteBuffers(1, &m_vbo_id);
+	}
+}
+
+
 bool Model_loader::Load(const char* model_name, double size_x, double size_y, double size_z, const char* texture_name)
 {
 	if (m_vbo_id == 0)
@@ -40,6 +56,7 @@ void Model_loader::load_texture(const char* texture_name)
 		texture_name,
 		SOIL_LOAD_AUTO,
 		SOIL_CREATE_NEW_ID,
+		//SOIL_FLAG_MIPMAPS | SOIL_FLAG_POWER_OF_TWO
 		0
 	);
 

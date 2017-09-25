@@ -9,6 +9,9 @@ using namespace std;
 
 HeightMap3D::HeightMap3D()
 {
+	texture = 0;
+	m_vbo_id = 0;
+	m_vbo_indeices_id = 0;
 }
 
 bool HeightMap3D::Load(const char* height_map_name, double max_corner_x, double max_corner_y, double max_corner_z, const char* texture_name)
@@ -85,7 +88,6 @@ bool HeightMap3D::load_texture(const char* filename)
 	else
 	{
 		cout << "The '" << filename << "' has successfully loaded!\n" << endl;
-		return true;
 	}
 
 	glBindTexture(GL_TEXTURE_2D, texture);

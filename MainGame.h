@@ -5,6 +5,7 @@
 #include "MainMenu.h"
 #include "Map.h"
 #include "Utils.h"
+#include "IngameElements2D.h"
 #include <SDL2/SDL.h>
 
 enum class GameState
@@ -32,6 +33,7 @@ private:
 	void GravityHandler(double elapsed_time);
 	void ProcessKeyRelease();
 	void CalculatePlayerDeathTime(double elapsed_time);
+	void CalcPlayerInTrapTime(double elapsed_time);
 
 	SDL_Window *m_window;
 	SDL_Cursor* cursor;
@@ -47,6 +49,7 @@ private:
 	Camera camera;
 	Sound sound;
 	Utils utils;
+	IngameElements2D ingame_elements;
 
 	float m_time_bw_steps;
 	int m_select_loop;
@@ -57,5 +60,12 @@ private:
 	float m_character_height;
 	float m_time_until_die;
     float m_velocity_y;
+	bool m_trap;
+	bool m_trap_anim;
+	float m_time_after_trapped;
+	float m_trap_z_position;
+	float death_anim_time;
+	int m_die_sound_loop, m_trap_sound_loop;
+	int m_crosshair_distance;
 };
 

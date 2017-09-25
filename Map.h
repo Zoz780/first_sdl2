@@ -37,6 +37,8 @@ public:
 
 	void DrawGun();
 
+	void DrawTrap();
+
 	void DrawObjects();
 
 	bool loadModels();
@@ -76,6 +78,7 @@ private:
 	VboDrawer tree_lower;
 	VboDrawer skybox;
 	VboDrawer mountain;
+	VboDrawer trap;
 
 	Platform platform;
 	Materials materal;

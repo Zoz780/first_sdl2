@@ -79,6 +79,7 @@ bool Map::loadModels()
 	tree_upper.Load("Models/tree_upper.obj", 20.0f, 20.0f, 20.0f, "Textures/tree_upper.png");
 	skybox.Load("Models/skybox.obj", 900.0f, 900.0f, 900.0f, "Textures/skybox.png");
 	mountain.Load("Models/mountain.obj", 50.0f, 50.0f, 50.0f, "Textures/mountain.png");
+	trap.Load("Models/trap.obj", 5.0f, 5.0f, 5.0f, "Textures/trap.png");
 	return true;
 }
 
@@ -158,6 +159,11 @@ void Map::DrawObjects()
 void Map::DrawGun()
 {
 	gun.DrawModel(0.1f, -0.03f, -0.07f);
+}
+
+void Map::DrawTrap()
+{
+	trap.DrawModel(0, 0, 0);
 }
 
 float Map::GetPlatformHeight(float x, float z)

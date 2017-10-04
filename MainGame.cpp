@@ -80,7 +80,7 @@ void MainGame::Init()
 	SDL_SetCursor(cursor);
 
 	SDL_GL_SetSwapInterval(1);
-	SDL_SetWindowFullscreen(m_window, GL_FALSE);
+	SDL_SetWindowFullscreen(m_window, GL_TRUE);
 	if((!sound.Init()) || (!sound.Load()))
 	{
 		utils.FatalError("Could not load or missing audio files!");
@@ -198,7 +198,7 @@ void MainGame::DrawGame()
 		{
 			if (m_trap_anim)
 			{
-				camera.rotate_camera(0, -4, -0.5f);
+				camera.rotate_camera(0, -7, -0.5f);
 			}
 			m_trap_z_position = map.GetPlatformHeight(camera.GetPosX(), camera.GetPosY());
 			glPushMatrix();

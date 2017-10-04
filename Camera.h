@@ -1,15 +1,9 @@
 #pragma once
 #include "Vec3.h"
+#include "Entity.h"
 #include "Utils.h"
 
-class Cam
-{
-public:
-	Vec3 position;
-	Vec3 pose;
-};
-
-class Camera
+class Camera : public Entity
 {
 public:
 	Camera();
@@ -74,9 +68,8 @@ public:
 	*/
 	void set_game_area();
 
-private:
+protected:
 
-	Cam cam;
 	Utils utils_cam;
 
 };

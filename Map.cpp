@@ -74,12 +74,12 @@ bool Map::loadModels()
 {
 	raptor.Load("Models/raptor.obj", 0.5f, 0.5f, 0.5f, "Textures/raptor.png");
 	floor.Load("Models/floor.obj", 10.0f, 4.0f, 10.0f, "Textures/floor.jpg");
-	gun.Load("Models/gun.obj", 0.2f, 0.2f, 0.2f, "Textures/gun.tga");
+	gun.Load("Models/ak.obj", 0.2f, 0.2f, 0.2f, "Textures/ak.png");
 	tree_lower.Load("Models/tree_lower.obj", 20.0f, 20.0f, 20.0f, "Textures/tree_lower.jpg");
 	tree_upper.Load("Models/tree_upper.obj", 20.0f, 20.0f, 20.0f, "Textures/tree_upper.png");
 	skybox.Load("Models/skybox.obj", 900.0f, 900.0f, 900.0f, "Textures/skybox.png");
 	mountain.Load("Models/mountain.obj", 50.0f, 50.0f, 50.0f, "Textures/mountain.png");
-	trap.Load("Models/trap.obj", 5.0f, 5.0f, 5.0f, "Textures/trap.png");
+	trap.Load("Models/trap.obj", 1.5f, 1.5f, 1.5f, "Textures/trap.png");
 	return true;
 }
 
@@ -158,7 +158,7 @@ void Map::DrawObjects()
 
 void Map::DrawGun()
 {
-	gun.DrawModel(0.1f, -0.03f, -0.07f);
+	gun.DrawModel(-0.01f, 0.01f, -0.35f);
 }
 
 void Map::DrawTrap()

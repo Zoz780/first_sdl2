@@ -19,6 +19,8 @@ public:
 
 	void PlayTrappedSound();
 
+	void Play_AK47_sound();
+
 	void PlayPlayerDieSound();
 
 	void StopMusic();
@@ -47,5 +49,6 @@ private:
 	Mix_Chunk *get_trapped;
 	Mix_Chunk *player_death;
 	Mix_Chunk *menu_select;
+	Mix_Chunk *ak_sound;
 };
 

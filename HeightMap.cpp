@@ -155,6 +155,51 @@ std::vector<VboVertex3D> HeightMap3D::convert_map_to_vbo()
 	return vertices;
 }
 
+std::vector<Triangles> HeightMap3D::specify_the_triangles()
+{
+	std::vector<Triangle_vertex> vertices;
+	Triangle_vertex triangle_point;
+	std::vector<Triangles> triangles;
+	Triangles one_triangle;
+
+	int row;
+	double x, y, z;
+
+	for (int i = 0; i < map.n_rows; ++i)
+	{
+		for (int j = 0; j < map.n_columns; ++j)
+		{
+			row = i;
+			x = (double)j / map.n_columns;
+			y = (double)row / map.n_rows;
+			z = (double)get_height_map_value(j, row);
+
+			triangle_point.x = x;
+			triangle_point.y = y;
+			triangle_point.z = z;
+
+			vertices.push_back(triangle_point);
+		}
+	}
+
+	for (int i = 0; i < vertices.size() - map.n_columns - 1; i++)
+	{
+		one_triangle.points[0] = vertices[i];
+		one_triangle.points[1] = vertices[i + 1];
+		one_triangle.points[2] = vertices[i + map.n_columns];
+
+		triangles.push_back(one_triangle);
+
+		one_triangle.points[0] = vertices[i + 1];
+		one_triangle.points[1] = vertices[i + map.n_columns];
+		one_triangle.points[2] = vertices[i + map.n_columns + 1];
+
+		triangles.push_back(one_triangle);
+	}
+	//cout << "Number of triangles: " << triangles.size() << endl;
+	return triangles;
+}
+
 
 bool HeightMap3D::load_height_map(const char* filename)
 {

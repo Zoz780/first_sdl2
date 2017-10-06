@@ -51,6 +51,8 @@ void Map::initMap()
 
 	glEnable(GL_NORMALIZE);
 	glEnable(GL_COLOR_MATERIAL);
+
+	materal.SetMaterial();
 }
 
 bool Map::LoadHeightMaps()
@@ -61,25 +63,47 @@ bool Map::LoadHeightMaps()
 	}
 	else
 		m_height_maps.push_back(height_map);
+	m_triangles = height_map.specify_the_triangles();
+
+
+	if (!height_map_objs.Load("HeightMaps/terrain_objs.png", 500.0, 500.0, 25.0, "Textures/base.png"))
+	{
+		return false;
+	}
+	else
+		m_height_maps.push_back(height_map_objs);
 	return true;
+}
+
+void Map::SetCameraDirectionVector(Vec3 Line[])
+{
+	m_camera_direction_vector[0].x = Line[0].x;
+	m_camera_direction_vector[0].y = Line[0].y;
+	m_camera_direction_vector[0].z = Line[0].z;
+
+	//cout << "P1: Xpos: " << m_camera_direction_vector[0].x << ", Ypos: " << m_camera_direction_vector[0].y << ", Zpos: " << m_camera_direction_vector[0].z << "\n";
+
+	m_camera_direction_vector[1].x = Line[1].x;
+	m_camera_direction_vector[1].y = Line[1].y;
+	m_camera_direction_vector[1].z = Line[1].z;
+
+	//cout << "P2: Xpos: " << m_camera_direction_vector[1].x << ", Ypos: " << m_camera_direction_vector[1].y << ", Zpos: " << m_camera_direction_vector[1].z << "\n";
 }
 
 void Map::FreeHeightMaps()
 {
-	height_map.free_height_map();
 	m_height_maps.pop_back();
 }
 
 bool Map::loadModels()
 {
-	raptor.Load("Models/raptor.obj", 0.5f, 0.5f, 0.5f, "Textures/raptor.png");
-	floor.Load("Models/floor.obj", 10.0f, 4.0f, 10.0f, "Textures/floor.jpg");
 	gun.Load("Models/ak.obj", 0.2f, 0.2f, 0.2f, "Textures/ak.png");
 	tree_lower.Load("Models/tree_lower.obj", 20.0f, 20.0f, 20.0f, "Textures/tree_lower.jpg");
 	tree_upper.Load("Models/tree_upper.obj", 20.0f, 20.0f, 20.0f, "Textures/tree_upper.png");
 	skybox.Load("Models/skybox.obj", 900.0f, 900.0f, 900.0f, "Textures/skybox.png");
 	mountain.Load("Models/mountain.obj", 50.0f, 50.0f, 50.0f, "Textures/mountain.png");
 	trap.Load("Models/trap.obj", 1.5f, 1.5f, 1.5f, "Textures/trap.png");
+	intersection_marker.Load("Models/ball1.obj", 0.4f, 0.4f, 0.4f, "Textures/base.png");
 	return true;
 }
 
@@ -97,6 +121,12 @@ void Map::DrawTree(float x, float y, float z, float rotate_z)
 void Map::HeightMapGrad(double x, double y, double* dx, double* dy)
 {
 	height_map.calc_height_map_gradient(x, y, dx, dy);
+	/*if (m_height_terrain >= m_height_objs)
+	{
+		height_map.calc_height_map_gradient(x, y, dx, dy);
+	}
+	else
+		height_map_objs.calc_height_map_gradient(x, y, dx, dy);*/
 }
 
 void Map::DrawObjects()
@@ -109,11 +139,57 @@ void Map::DrawObjects()
 	glMatrixMode(GL_MODELVIEW);
 	glEnable(GL_TEXTURE_2D);
 
-	materal.SetMaterial();
+	/*for (int i = 0; i < 50; i++)
+	{
+		Triangle[0].x = m_triangles[i].points[0].x;
+		Triangle[0].y = m_triangles[i].points[0].y;
+		Triangle[0].z = m_triangles[i].points[0].z;
+
+		Triangle[1].x = m_triangles[i].points[2].x;
+		Triangle[1].y = m_triangles[i].points[2].y;
+		Triangle[1].z = m_triangles[i].points[2].z;
+
+		Triangle[2].x = m_triangles[i].points[2].x;
+		Triangle[2].y = m_triangles[i].points[2].y;
+		Triangle[2].z = m_triangles[i].points[2].z;
+		m_intersection_point = bullet.IntersectedPolygon(Triangle, m_camera_direction_vector, 3);
+	}*/
+
+	//Just a test!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	Triangle[0].x = 350;
+	Triangle[0].y = 50;
+	Triangle[0].z = 0;
+
+	Triangle[1].x = 400;
+	Triangle[1].y = 50;
+	Triangle[1].z = 50;
+
+	Triangle[2].x = 450;
+	Triangle[2].y = 50;
+	Triangle[2].z = 0;
+
+	glDisable(GL_TEXTURE_2D);
+	glBegin(GL_TRIANGLES);
+	glColor3f(0, 0.5, 1);
+	glVertex3f(Triangle[0].x, Triangle[0].y, Triangle[0].z);
+
+	glVertex3f(Triangle[1].x, Triangle[1].y, Triangle[1].z);
+
+	glVertex3f(Triangle[2].x, Triangle[2].y, Triangle[2].z);
+	glEnd();
+	glColor3f(1, 1, 1);
+	glEnable(GL_TEXTURE_2D);
+	//Test code end!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	m_intersection_point = bullet.IntersectedPolygon(Triangle, m_camera_direction_vector, 3);
+
+	//intersection_marker.DrawModel(m_camera_direction_vector[1].x, m_camera_direction_vector[1].y, m_camera_direction_vector[1].z);
+	intersection_marker.DrawModel(m_intersection_point.x, m_intersection_point.y, m_intersection_point.z);
 
 	glPushMatrix();
 	glTranslatef(0, 0, -0.1);
 	height_map.DrawHeightMap();
+	//height_map_objs.DrawHeightMap();
 	glPopMatrix();
 
 	//skybox
@@ -133,11 +209,6 @@ void Map::DrawObjects()
 	mountain.DrawModel(750, 350, -20);
 	mountain.DrawModel(750, 550, -50);
 	
-	glPushMatrix();
-	glRotatef(90.0f, 1, 0, 0);
-	raptor.DrawModel(0, 0, 100);
-	glPopMatrix();
-
 	DrawTree(495, 392, 10, 0);
 	DrawTree(480, 285, 10, 0);
 
@@ -153,6 +224,7 @@ void Map::DrawObjects()
 	DrawTree(274.5, 321, 20, 90);
 	DrawTree(339, 500, 15, 0);
 	DrawTree(72, 500, 13, 0);
+	height_map.specify_the_triangles();
 	
 }
 
@@ -169,19 +241,22 @@ void Map::DrawTrap()
 float Map::GetPlatformHeight(float x, float z)
 {
 	float height = 0.0f;
-	/*for (const Platform& platform : m_platforms) 
-	{
-		if (platform.IsOnPlatform(x,z))
-		{
-			height = platform.GetHeight(x, z);
-		}
-	}*/
 
 	for (const HeightMap3D& h : m_height_maps)
 	{
 		if (height_map.is_on_height_map(x, z)) 
 		{
-			height = height_map.get_height_map_height(x, z);
+			m_height_terrain = height_map.get_height_map_height(x, z);
+			m_height_objs = height_map_objs.get_height_map_height(x, z);
+
+
+			height = m_height_terrain;
+			/*if (m_height_terrain >= m_height_objs)
+			{
+				height = m_height_terrain;
+			}
+			else
+				height = m_height_objs;*/
 		}
 	}
 	return height;

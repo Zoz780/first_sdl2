@@ -44,6 +44,7 @@ private:
 
 	Map map;
 	MainMenu menu;
+	Vec3 CameraDirLine[2];
 
 	Action action;
 	Camera camera;

@@ -80,7 +80,7 @@ void MainGame::Init()
 	SDL_SetCursor(cursor);
 
 	SDL_GL_SetSwapInterval(1);
-	SDL_SetWindowFullscreen(m_window, GL_TRUE);
+	SDL_SetWindowFullscreen(m_window, GL_FALSE);
 	if((!sound.Init()) || (!sound.Load()))
 	{
 		utils.FatalError("Could not load or missing audio files!");
@@ -241,7 +241,7 @@ void MainGame::DrawGame()
 	}
 	glPopMatrix();
 	
-	//cout << "X: " << camera.GetPosX() << ",  Y:" << camera.GetPosY() << endl;
+	cout << "X: " << camera.GetPosX() << ",  Y:" << camera.GetPosY() << endl;
 
 	SDL_GL_SwapWindow(m_window);
 }
@@ -350,6 +350,13 @@ void MainGame::CameraMovementHandler(double elapsed_time)
 			}
 		}
 	}
+	CameraDirLine[0].x = camera.GetPosX();
+	CameraDirLine[0].y = camera.GetPosY();
+	CameraDirLine[0].z = camera.GetPosZ();
+	
+	CameraDirLine[1] = camera.get_camera_far_point();
+
+	map.SetCameraDirectionVector(CameraDirLine);
 
 	GravityHandler(elapsed_time);
 	CalculatePlayerDeathTime(elapsed_time);
@@ -496,6 +503,13 @@ void MainGame::MouseMotionHandler()
 						//cout << "Mouse speed: " << m_mouse_speed << endl;
 					}
 					//cout << "y: " << evnt.wheel.y << endl;
+				}
+				if (evnt.type == SDL_MOUSEBUTTONDOWN)
+				{
+					if (evnt.button.button == SDL_BUTTON_LEFT)
+					{
+						sound.Play_AK47_sound();
+					}
 				}
 			}
 		}

@@ -33,6 +33,20 @@ public:
 	GLfloat v;
 };
 
+class Triangle_vertex
+{
+public:
+	GLfloat x;
+	GLfloat y;
+	GLfloat z;
+};
+
+class Triangles
+{
+public:
+	Triangle_vertex points[3];
+};
+
 class HeightMap3D
 {
 public:
@@ -79,9 +93,12 @@ public:
 	*/
 	void free_height_map();
 
+	std::vector<Triangles> specify_the_triangles();
+
 protected:
 	HeightMap map;
 	VboVertex3D vbo_3d;
+	//Triangle_vertex triangle_vertices;
 
 	GLuint texture;
 	GLuint m_vbo_id;
@@ -92,6 +109,8 @@ protected:
 	std::vector<VboVertex3D> convert_map_to_vbo();
 
 	std::vector<GLuint> calculate_indices();
+
+	//std::vector<Triangles> specify_the_triangles();
 
 	bool load_texture(const char* filename);
 

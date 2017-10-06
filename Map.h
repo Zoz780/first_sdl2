@@ -7,6 +7,7 @@
 #include "Platform.h"
 #include "Position.h"
 #include "Materials.h"
+#include "BulletCalcs3D.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -56,6 +57,8 @@ public:
 	*/
 	bool loadPlatforms();
 
+	void SetCameraDirectionVector(Vec3 Line[]);
+
 	void HeightMapGrad(double x, double y, double* dx, double* dy);
 
 protected:
@@ -70,8 +73,6 @@ private:
     std::vector<Platform> m_platforms;
 	std::vector<HeightMap3D> m_height_maps;
 
-	VboDrawer raptor;
-	VboDrawer floor;
 	VboDrawer gun;
 	VboDrawer ground;
 	VboDrawer tree_upper;
@@ -79,10 +80,21 @@ private:
 	VboDrawer skybox;
 	VboDrawer mountain;
 	VboDrawer trap;
+	VboDrawer intersection_marker;
 
 	Platform platform;
 	Materials materal;
+	BulletCalcs3D bullet;
 	DrawHeightMapVBO height_map;
+	DrawHeightMapVBO height_map_objs;
+
+	std::vector<Triangles> m_triangles;
+	Vec3 m_camera_direction_vector[2];
+	Vec3 Triangle[3];
+	Vec3 m_intersection_point;
+
+	float m_height_terrain = 0.0f;
+	float m_height_objs = 0.0f;
 	
 };
 

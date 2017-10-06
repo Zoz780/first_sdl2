@@ -68,9 +68,15 @@ public:
 	*/
 	void set_game_area();
 
+	/**
+	* Get the far point of the camera direction line.
+	*/
+	Vec3 get_camera_far_point();
+
 protected:
 
 	Utils utils_cam;
+	Vec3 direction;
 
 };
 

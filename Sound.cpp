@@ -34,8 +34,9 @@ bool Sound::Load()
 	menu_select = Mix_LoadWAV("Sound/selection.wav");
 	get_trapped = Mix_LoadWAV("Sound/trap1.wav");
 	player_death = Mix_LoadWAV("Sound/trap2.wav");
+	ak_sound = Mix_LoadWAV("Sound/ak_sound.wav");
 
-	if ((step == NULL) || (menu_select == NULL) || (get_trapped == NULL) || (player_death == NULL))
+	if ((step == NULL) || (menu_select == NULL) || (get_trapped == NULL) || (player_death == NULL) || (ak_sound == NULL))
 	{
 		return false;
 	}
@@ -45,13 +46,13 @@ bool Sound::Load()
 void Sound::PlaySteps()
 {
 	Mix_PlayChannel(0, step, 0);
-	Mix_Volume(0, m_volume * 0.15);
+	Mix_Volume(0, m_volume);
 }
 
 void Sound::PlayIngameMusic()
 {
 	Mix_PlayMusic(ingame_bgm, -1);
-	Mix_VolumeMusic(m_volume * 0.6);
+	Mix_VolumeMusic(m_volume);
 }
 
 void Sound::PlayMenuMusic()
@@ -62,14 +63,20 @@ void Sound::PlayMenuMusic()
 
 void Sound::PlayTrappedSound()
 {
-	Mix_PlayChannel(2, get_trapped, 0);
-	Mix_Volume(2, m_volume);
+	Mix_PlayChannel(0, get_trapped, 0);
+	Mix_Volume(0, m_volume);
+}
+
+void Sound::Play_AK47_sound()
+{
+	Mix_PlayChannel(-1, ak_sound, 0);
+	Mix_Volume(-1, m_volume);
 }
 
 void Sound::PlayPlayerDieSound()
 {
-	Mix_PlayChannel(3, player_death, 0);
-	Mix_Volume(3, m_volume * 0.8);
+	Mix_PlayChannel(0, player_death, 0);
+	Mix_Volume(0, m_volume);
 }
 
 void Sound::StopMusic()
@@ -123,6 +130,6 @@ void Sound::MenuVolumeDown()
 
 void Sound::PlayMenuSelectSound()
 {
-	Mix_PlayChannel(1, menu_select, 0);
-	Mix_Volume(1, m_menu_volume * 0.25);
+	Mix_PlayChannel(0, menu_select, 0);
+	Mix_Volume(0, m_menu_volume);
 }

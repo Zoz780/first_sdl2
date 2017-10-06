@@ -67,11 +67,11 @@ void Camera::set_view_point()
 	float verticalAngle = utils_cam.ToRad(pose.x);
 	float horizontalAngle = utils_cam.ToRad(pose.y);
 
-	float dx = cos(verticalAngle) * cos(horizontalAngle);
-	float dy = cos(verticalAngle) * sin(horizontalAngle);
-	float dz = sin(verticalAngle);
+	direction.x = cos(verticalAngle) * cos(horizontalAngle);
+	direction.y = cos(verticalAngle) * sin(horizontalAngle);
+	direction.z = sin(verticalAngle);
 
-	float cx = position.x + dx, cy = position.y + dy, cz = position.z + dz;
+	float cx = position.x + direction.x, cy = position.y + direction.y, cz = position.z + direction.z;
 	gluLookAt(position.x, position.y, position.z, cx, cy, cz, 0, 0, 1);
 }
 
@@ -131,6 +131,17 @@ void Camera::move_camera_up(double distance)
 void Camera::move_camera_down(double distance)
 {
 	position.z -= distance;
+}
+
+Vec3 Camera::get_camera_far_point()
+{
+	Vec3 Line_far_point;
+
+	Line_far_point.x = position.x + (direction.x * 500);
+	Line_far_point.y = position.y + (direction.y * 500);
+	Line_far_point.z = position.z + (direction.z * 500);
+
+	return Line_far_point;
 }
 
 void Camera::set_game_area()

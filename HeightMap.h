@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Vec3.h"
 #include "Utils.h"
+#include "Triangles.h"
 #include <vector>
 #include <glew.h>
 #include <glut.h>
@@ -31,20 +31,6 @@ public:
 	GLfloat b;
 	GLfloat u;
 	GLfloat v;
-};
-
-class Triangle_vertex
-{
-public:
-	GLfloat x;
-	GLfloat y;
-	GLfloat z;
-};
-
-class Triangles
-{
-public:
-	Triangle_vertex points[3];
 };
 
 class HeightMap3D

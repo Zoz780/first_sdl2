@@ -157,8 +157,8 @@ std::vector<VboVertex3D> HeightMap3D::convert_map_to_vbo()
 
 std::vector<Triangles> HeightMap3D::specify_the_triangles()
 {
-	std::vector<Triangle_vertex> vertices;
-	Triangle_vertex triangle_point;
+	std::vector<Vec3> vertices;
+	Vec3 triangle_point;
 	std::vector<Triangles> triangles;
 	Triangles one_triangle;
 

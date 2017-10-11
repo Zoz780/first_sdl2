@@ -90,7 +90,7 @@ private:
 
 	std::vector<Triangles> m_triangles;
 	Vec3 m_camera_direction_vector[2];
-	Vec3 Triangle[3];
+	Vec3 Triangle[2][3];
 	Vec3 m_intersection_point;
 
 	float m_height_terrain = 0.0f;

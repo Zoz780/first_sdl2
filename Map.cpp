@@ -141,7 +141,7 @@ void Map::DrawObjects()
 
 	/*for (int i = 0; i < 50; i++)
 	{
-		Triangle[0].x = m_triangles[i].points[0].x;
+		/*Triangle[0].x = m_triangles[i].points[0].x;
 		Triangle[0].y = m_triangles[i].points[0].y;
 		Triangle[0].z = m_triangles[i].points[0].z;
 
@@ -152,36 +152,63 @@ void Map::DrawObjects()
 		Triangle[2].x = m_triangles[i].points[2].x;
 		Triangle[2].y = m_triangles[i].points[2].y;
 		Triangle[2].z = m_triangles[i].points[2].z;
-		m_intersection_point = bullet.IntersectedPolygon(Triangle, m_camera_direction_vector, 3);
+		m_intersection_point = bullet.IntersectedPolygon(m_triangles[i].points, m_camera_direction_vector, 3);
+
 	}*/
 
 	//Just a test!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	Triangle[0].x = 350;
-	Triangle[0].y = 50;
-	Triangle[0].z = 0;
 
-	Triangle[1].x = 400;
-	Triangle[1].y = 50;
-	Triangle[1].z = 50;
+	Triangle[0][0].x = 350;
+	Triangle[0][0].y = 50;
+	Triangle[0][0].z = 0;
 
-	Triangle[2].x = 450;
-	Triangle[2].y = 50;
-	Triangle[2].z = 0;
+	Triangle[0][1].x = 400;
+	Triangle[0][1].y = 50;
+	Triangle[0][1].z = 50;
+
+	Triangle[0][2].x = 450;
+	Triangle[0][2].y = 50;
+	Triangle[0][2].z = 0;
+
+	/*Triangle[1][0].x = 250;
+	Triangle[1][0].y = 50;
+	Triangle[1][0].z = 0;
+
+	Triangle[1][1].x = 300;
+	Triangle[1][1].y = 50;
+	Triangle[1][1].z = 50;
+
+	Triangle[1][2].x = 350;
+	Triangle[1][2].y = 50;
+	Triangle[1][2].z = 0;*/
+
+	for (int i = 0; i < 1; i++)
+	{
+			m_intersection_point = bullet.IntersectedPolygon(Triangle[i], m_camera_direction_vector, 3);
+	}
 
 	glDisable(GL_TEXTURE_2D);
 	glBegin(GL_TRIANGLES);
 	glColor3f(0, 0.5, 1);
-	glVertex3f(Triangle[0].x, Triangle[0].y, Triangle[0].z);
+	glVertex3f(Triangle[0][0].x, Triangle[0][0].y, Triangle[0][0].z);
 
-	glVertex3f(Triangle[1].x, Triangle[1].y, Triangle[1].z);
+	glVertex3f(Triangle[0][1].x, Triangle[0][1].y, Triangle[0][1].z);
 
-	glVertex3f(Triangle[2].x, Triangle[2].y, Triangle[2].z);
+	glVertex3f(Triangle[0][2].x, Triangle[0][2].y, Triangle[0][2].z);
 	glEnd();
+
+	/*glBegin(GL_TRIANGLES);
+	glColor3f(0, 0.5, 1);
+	glVertex3f(Triangle[1][0].x, Triangle[1][0].y, Triangle[1][0].z);
+
+	glVertex3f(Triangle[1][1].x, Triangle[1][1].y, Triangle[1][1].z);
+
+	glVertex3f(Triangle[1][2].x, Triangle[1][2].y, Triangle[1][2].z);
+	glEnd();*/
 	glColor3f(1, 1, 1);
 	glEnable(GL_TEXTURE_2D);
 	//Test code end!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-	m_intersection_point = bullet.IntersectedPolygon(Triangle, m_camera_direction_vector, 3);
 
 	//intersection_marker.DrawModel(m_camera_direction_vector[1].x, m_camera_direction_vector[1].y, m_camera_direction_vector[1].z);
 	intersection_marker.DrawModel(m_intersection_point.x, m_intersection_point.y, m_intersection_point.z);
@@ -189,7 +216,6 @@ void Map::DrawObjects()
 	glPushMatrix();
 	glTranslatef(0, 0, -0.1);
 	height_map.DrawHeightMap();
-	//height_map_objs.DrawHeightMap();
 	glPopMatrix();
 
 	//skybox

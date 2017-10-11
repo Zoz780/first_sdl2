@@ -2,10 +2,12 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <float.h>
-#include "Vec3.h"
+#include "Triangles.h"
 
 #include <iostream>
 using namespace std;
+
+#include <vector>
 
 class BulletCalcs3D
 {

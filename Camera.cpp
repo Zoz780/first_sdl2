@@ -19,47 +19,47 @@ Camera::Camera()
 
 void Camera::SetPosX(float xpos)
 {
-	position.SetX(xpos);
+	position.x = xpos;
 }
 float Camera::GetPosX()
 {
-	return position.GetX();
+	return position.x;
 }
 
 void Camera::SetPosY(float ypos)
 {
-	position.SetY(ypos);
+	position.y = ypos;
 }
 float Camera::GetPosY()
 {
-	return position.GetY();
+	return position.y;
 }
 
 void Camera::SetPosZ(float zpos)
 {
-	position.SetZ(zpos);
+	position.z = zpos;
 }
 float Camera::GetPosZ()
 {
-	return position.GetZ();
+	return position.z;
 }
 
 void Camera::SetPoseX(float xpose)
 {
-	pose.SetX(xpose);
+	pose.x = xpose;
 }
 float Camera::GetPoseX()
 {
-	return pose.GetX();
+	return pose.x;
 }
 
 void Camera::SetPoseY(float ypose)
 {
-	pose.SetY(ypose);
+	pose.y = ypose;
 }
 float Camera::GetPoseY()
 {
-	return pose.GetY();
+	return pose.y;
 }
 
 void Camera::set_view_point()
